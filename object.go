@@ -242,6 +242,13 @@ func NewLinkRichText(content, link string) *RichText {
 
 // TODO: NewMentionRichText, NewEquationRichText
 
+func (rt *RichText) MakeLink(destination string) {
+	if rt.Text != nil {
+		rt.Text.Link = &Link{Url: destination}
+		rt.Href = destination
+	}
+}
+
 func (rt *RichText) AnnotateBold() {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}

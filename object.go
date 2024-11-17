@@ -215,3 +215,77 @@ type Verification struct {
 
 type Button struct {
 }
+
+func NewTextRichText(text string) *RichText {
+	return &RichText{
+		Type: ObjectTypeText,
+		Text: &Text{
+			Content: text,
+		},
+		PlainText: text,
+	}
+}
+
+func NewLinkRichText(content, link string) *RichText {
+	return &RichText{
+		Type: ObjectTypeText,
+		Text: &Text{
+			Content: content,
+			Link: &Link{
+				Url: link,
+			},
+		},
+		PlainText: content,
+		Href:      link,
+	}
+}
+
+// TODO: NewMentionRichText, NewEquationRichText
+
+func (rt *RichText) AnnotateBold() {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Bold = true
+}
+
+func (rt *RichText) AnnotateItalic() {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Italic = true
+}
+
+func (rt *RichText) AnnotateStrikethrough() {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Strikethrough = true
+}
+
+func (rt *RichText) AnnotateUnderline() {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Underline = true
+}
+
+func (rt *RichText) AnnotateCode() {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Code = true
+}
+
+func (rt *RichText) AnnotateColor(color Color) {
+	if rt.Annotations == nil {
+		rt.Annotations = &Annotations{}
+	}
+
+	rt.Annotations.Color = color
+}

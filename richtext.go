@@ -63,66 +63,76 @@ type RichText struct {
 	Href        string       `json:"href,omitempty"`
 }
 
+// TODO: switch to Clone-based modifiers
+
 // MakeLink makes the RichText a link to the given destination
-func (rt *RichText) MakeLink(destination string) {
+func (rt *RichText) MakeLink(destination string) *RichText {
 	if rt.Text != nil {
 		rt.Text.Link = &Link{Url: destination}
 		rt.Href = destination
 	}
+
+	return rt
 }
 
 // AnnotateBold annotates the RichText with bold text
-func (rt *RichText) AnnotateBold() {
+func (rt *RichText) AnnotateBold() *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Bold = true
+	return rt
 }
 
 // AnnotateItalic annotates the RichText with italic text
-func (rt *RichText) AnnotateItalic() {
+func (rt *RichText) AnnotateItalic() *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Italic = true
+	return rt
 }
 
 // AnnotateStrikethrough annotates the RichText with strikethrough text
-func (rt *RichText) AnnotateStrikethrough() {
+func (rt *RichText) AnnotateStrikethrough() *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Strikethrough = true
+	return rt
 }
 
 // AnnotateUnderline annotates the RichText with underline text
-func (rt *RichText) AnnotateUnderline() {
+func (rt *RichText) AnnotateUnderline() *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Underline = true
+	return rt
 }
 
 // AnnotateCode annotates the RichText with code text
-func (rt *RichText) AnnotateCode() {
+func (rt *RichText) AnnotateCode() *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Code = true
+	return rt
 }
 
 // AnnotateColor annotates the RichText with a specific color
-func (rt *RichText) AnnotateColor(color Color) {
+func (rt *RichText) AnnotateColor(color Color) *RichText {
 	if rt.Annotations == nil {
 		rt.Annotations = &Annotations{}
 	}
 
 	rt.Annotations.Color = color
+	return rt
 }
 
 // NewTextRichText creates a new RichText with the given text

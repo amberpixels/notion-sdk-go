@@ -69,7 +69,7 @@ type RichText struct {
 	Href        string       `json:"href,omitempty"`
 }
 
-// TODO: switch to Clone-based modifiers
+// TODO(https://github.com/amberpixels/notion-sdk-go/issues/4): switch to Clone-based modifiers
 
 // MakeLink makes the RichText a link to the given destination
 func (rt *RichText) MakeLink(destination string) *RichText {
@@ -169,7 +169,7 @@ func NewLinkRichText(content, link string) *RichText {
 	}
 }
 
-// TODO: NewMentionRichText, NewEquationRichText
+// TODO(https://github.com/amberpixels/notion-sdk-go/issues/4): NewMentionRichText, NewEquationRichText
 /*
 func NewDatabaseMentionRichText(databaseID ObjectID) *RichText {
 	return &RichText{

@@ -1109,6 +1109,7 @@ type appendBlockResponse struct {
 	Results []map[string]interface{} `json:"results"`
 }
 
+// UnmarshalJSON does custom unmarshalling for AppendBlockChildrenResponse
 func (r *AppendBlockChildrenResponse) UnmarshalJSON(data []byte) error {
 	var raw appendBlockResponse
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -1130,6 +1131,7 @@ func (r *AppendBlockChildrenResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// nolint:gocyclo
 func decodeBlock(raw map[string]interface{}) (Block, error) {
 	var b Block
 	switch BlockType(raw["type"].(string)) {
@@ -1230,5 +1232,4 @@ func SetChildren(b Block, children Blocks) {
 		childrenHolder.SetChildren(children)
 		return
 	}
-	return
 }

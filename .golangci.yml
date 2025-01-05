@@ -1,0 +1,27 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - gocyclo
+    - ineffassign
+    - unused
+    - typecheck
+    - unconvert
+    - misspell
+    - gofmt
+    - gosec
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - linters:
+        - gosec
+      path: _test.go

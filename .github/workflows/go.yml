@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Check Formatting
+      run: |
+        go fmt ./...
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Code is not properly formatted. Run 'go fmt ./...' locally before committing."
+          git diff
+          exit 1
+        fi
+        
+    - name: Vet
+      run: go vet ./...
+
+    - name: Test
+      run: go test -v ./...

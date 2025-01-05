@@ -11,7 +11,7 @@ focusing on introducing new features, breaking changes, and enhanced API coverag
 
 [![GitHub tag (latest)](https://img.shields.io/github/v/tag/amberpixels/notion-sdk-go?label=go%20module)](https://github.com/amberpixels/notion-sdk-go/tags)
 [![Go Reference](https://pkg.go.dev/badge/github.com/amberpixels/notion-sdk-go.svg)](https://pkg.go.dev/github.com/amberpixels/notion-sdk-go)
-[![Test](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml/badge.svg)](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml)
+[![Test](https://github.com/amberpixels/notion-sdk-go/actions/workflows/go.yml/badge.svg)](https://github.com/amberpixels/notion-sdk-go/actions/workflows/go.yml)
 
 ## Supported APIs
 

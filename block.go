@@ -11,9 +11,7 @@ import (
 
 type BlockID string
 
-func (bID BlockID) String() string {
-	return string(bID)
-}
+func (bID BlockID) String() string { return string(bID) }
 
 type BlockService interface {
 	AppendChildren(context.Context, BlockID, *AppendBlockChildrenRequest) (*AppendBlockChildrenResponse, error)
@@ -208,16 +206,10 @@ func (bt BlockType) String() string {
 }
 
 type Block interface {
+	DataObject
+
 	GetType() BlockType
-	GetID() BlockID
-	GetObject() ObjectType
-	GetCreatedTime() *time.Time
-	GetLastEditedTime() *time.Time
-	GetCreatedBy() *User
-	GetLastEditedBy() *User
 	GetHasChildren() bool
-	GetArchived() bool
-	GetParent() *Parent
 	GetRichTextString() string
 }
 
@@ -245,57 +237,34 @@ func (b *Blocks) UnmarshalJSON(data []byte) error {
 // See https://developers.notion.com/reference/block for the list.
 // BasicBlock implements the Block interface.
 type BasicBlock struct {
-	Object         ObjectType `json:"object"`
-	ID             BlockID    `json:"id,omitempty"`
-	Type           BlockType  `json:"type"`
-	CreatedTime    *time.Time `json:"created_time,omitempty"`
-	LastEditedTime *time.Time `json:"last_edited_time,omitempty"`
-	CreatedBy      *User      `json:"created_by,omitempty"`
-	LastEditedBy   *User      `json:"last_edited_by,omitempty"`
-	HasChildren    bool       `json:"has_children,omitempty"`
-	Archived       bool       `json:"archived,omitempty"`
-	Parent         *Parent    `json:"parent,omitempty"`
+	DataObjectAtom
+
+	Type        BlockType `json:"type"`
+	HasChildren bool      `json:"has_children,omitempty"`
 }
 
-func (b BasicBlock) GetType() BlockType {
-	return b.Type
-}
+func (b BasicBlock) GetType() BlockType { return b.Type }
 
-func (b BasicBlock) GetID() BlockID {
-	return b.ID
-}
+func (b BasicBlock) GetID() ObjectID { return b.ID }
 
-func (b BasicBlock) GetObject() ObjectType {
-	return b.Object
-}
+func (b BasicBlock) GetObject() ObjectType { return ObjectTypeBlock }
 
-func (b BasicBlock) GetCreatedTime() *time.Time {
-	return b.CreatedTime
-}
+func (b BasicBlock) GetCreatedTime() *time.Time { return b.CreatedTime }
 
-func (b BasicBlock) GetLastEditedTime() *time.Time {
-	return b.LastEditedTime
-}
+func (b BasicBlock) GetLastEditedTime() *time.Time { return b.LastEditedTime }
 
-func (b BasicBlock) GetCreatedBy() *User {
-	return b.CreatedBy
-}
+func (b BasicBlock) GetCreatedBy() *User { return b.CreatedBy }
 
-func (b BasicBlock) GetLastEditedBy() *User {
-	return b.LastEditedBy
-}
+func (b BasicBlock) GetLastEditedBy() *User { return b.LastEditedBy }
 
-func (b BasicBlock) GetHasChildren() bool {
-	return b.HasChildren
-}
+func (b BasicBlock) GetHasChildren() bool { return b.HasChildren }
 
-func (b BasicBlock) GetArchived() bool {
-	return b.Archived
-}
+func (b BasicBlock) GetArchived() bool { return b.Archived }
 
-func (b BasicBlock) GetParent() *Parent {
-	return b.Parent
-}
+func (b BasicBlock) GetInTrash() bool { return b.InTrash }
+
+func (b BasicBlock) GetParent() Parent { return b.Parent }
+
 func concatenateRichText(richtext []RichText) string {
 	var result string
 	for _, rt := range richtext {
@@ -389,6 +358,7 @@ func (b BasicBlock) GetRichTextString() string {
 }
 
 var _ Block = (*BasicBlock)(nil)
+var _ DataObject = (*BasicBlock)(nil)
 
 type ParagraphBlock struct {
 	BasicBlock

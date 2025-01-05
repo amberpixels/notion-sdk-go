@@ -21,6 +21,69 @@ type Object interface {
 	GetObject() ObjectType
 }
 
+// DataObject wraps the logic of Notion Block, Page and Database
+type DataObject interface {
+	Object
+
+	GetID() ObjectID
+	GetParent() Parent
+
+	GetCreatedTime() *time.Time
+	GetCreatedBy() *User
+
+	GetLastEditedTime() *time.Time
+	GetLastEditedBy() *User
+
+	GetArchived() bool
+	GetInTrash() bool
+}
+
+// DataObjectAtom is the base struct for Notion Block, Page and Database
+type DataObjectAtom struct {
+	Object ObjectType `json:"object"`
+
+	ID     ObjectID `json:"id,omitempty"`
+	Parent Parent   `json:"parent,omitempty"`
+
+	CreatedTime *time.Time `json:"created_time"`
+	CreatedBy   *User      `json:"created_by"`
+
+	LastEditedTime *time.Time `json:"last_edited_time"`
+	LastEditedBy   *User      `json:"last_edited_by"`
+
+	Archived bool `json:"archived"`
+	InTrash  bool `json:"in_trash"`
+}
+
+func (d DataObjectAtom) GetID() ObjectID { return d.ID }
+
+func (d DataObjectAtom) GetCreatedTime() *time.Time { return d.CreatedTime }
+
+func (d DataObjectAtom) GetLastEditedTime() *time.Time { return d.LastEditedTime }
+
+func (d DataObjectAtom) GetCreatedBy() *User { return d.CreatedBy }
+
+func (d DataObjectAtom) GetLastEditedBy() *User { return d.LastEditedBy }
+
+func (d DataObjectAtom) GetArchived() bool { return d.Archived }
+
+func (d DataObjectAtom) GetInTrash() bool { return d.InTrash }
+
+func (d DataObjectAtom) GetParent() Parent { return d.Parent }
+
+type ContentMedia interface {
+	GetIcon() *Icon
+	GetCover() *Image
+}
+
+type ContentMediaAtom struct {
+	Icon  *Icon  `json:"icon,omitempty"`
+	Cover *Image `json:"cover,omitempty"`
+}
+
+func (c ContentMediaAtom) GetIcon() *Icon   { return c.Icon }
+func (c ContentMediaAtom) GetCover() *Image { return c.Cover }
+
 type Color string
 
 func (c Color) String() string {

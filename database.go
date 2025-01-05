@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 )
 
 type DatabaseID string
@@ -178,32 +177,29 @@ type DatabaseUpdateRequest struct {
 }
 
 type Database struct {
-	Object         ObjectType `json:"object"`
-	ID             ObjectID   `json:"id"`
-	CreatedTime    time.Time  `json:"created_time"`
-	LastEditedTime time.Time  `json:"last_edited_time"`
-	CreatedBy      User       `json:"created_by,omitempty"`
-	LastEditedBy   User       `json:"last_edited_by,omitempty"`
-	Title          []RichText `json:"title"`
-	Parent         Parent     `json:"parent"`
-	URL            string     `json:"url"`
-	PublicURL      string     `json:"public_url"`
+	DataObjectAtom
+	ContentMediaAtom
+
+	Title       []RichText `json:"title"`
+	Description []RichText `json:"description"`
+
+	IsInline bool `json:"is_inline"`
+
+	URL       string `json:"url"`
+	PublicURL string `json:"public_url"`
+
 	// Properties is a map of property configurations that defines what Page.Properties each page of the database can use
-	Properties  PropertyConfigs `json:"properties"`
-	Description []RichText      `json:"description"`
-	IsInline    bool            `json:"is_inline"`
-	Archived    bool            `json:"archived"`
-	Icon        *Icon           `json:"icon,omitempty"`
-	Cover       *Image          `json:"cover,omitempty"`
+	Properties PropertyConfigs `json:"properties"`
 }
 
-func (db *Database) GetObject() ObjectType {
-	return db.Object
-}
+var _ DataObject = (*Database)(nil)
+var _ ContentMedia = (*Page)(nil)
+
+func (db *Database) GetObject() ObjectType { return ObjectTypeDatabase }
 
 type DatabaseQueryResponse struct {
 	Object     ObjectType `json:"object"`
-	Results    []Page     `json:"results"`
+	Results    []Database `json:"results"`
 	HasMore    bool       `json:"has_more"`
 	NextCursor Cursor     `json:"next_cursor"`
 }

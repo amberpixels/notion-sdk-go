@@ -3,8 +3,8 @@ package notionapi_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -13,6 +13,8 @@ import (
 )
 
 func TestBlockClient(t *testing.T) {
+	user := notionapi.NewUser("some_id")
+
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
 	if err != nil {
 		t.Fatal(err)
@@ -74,8 +76,7 @@ func TestBlockClient(t *testing.T) {
 					Children: []notionapi.Block{
 						&notionapi.Heading2Block{
 							BasicBlock: notionapi.BasicBlock{
-								Object: notionapi.ObjectTypeBlock,
-								Type:   notionapi.BlockTypeHeading2,
+								Type: notionapi.BlockTypeHeading2,
 							},
 							Heading2: struct {
 								RichText     []notionapi.RichText `json:"rich_text"`
@@ -97,18 +98,14 @@ func TestBlockClient(t *testing.T) {
 					Results: []notionapi.Block{
 						notionapi.ParagraphBlock{
 							BasicBlock: notionapi.BasicBlock{
-								Object:         notionapi.ObjectTypeBlock,
-								ID:             "some_id",
-								CreatedTime:    &timestamp,
-								LastEditedTime: &timestamp,
-								Type:           notionapi.BlockTypeParagraph,
-								CreatedBy: &notionapi.User{
-									Object: "user",
-									ID:     "some_id",
-								},
-								LastEditedBy: &notionapi.User{
-									Object: "user",
-									ID:     "some_id",
+								Type: notionapi.BlockTypeParagraph,
+								DataObjectAtom: notionapi.DataObjectAtom{
+									Object:         notionapi.ObjectTypeBlock,
+									ID:             "some_id",
+									CreatedTime:    &timestamp,
+									LastEditedTime: &timestamp,
+									CreatedBy:      user,
+									LastEditedBy:   user,
 								},
 							},
 							Paragraph: notionapi.Paragraph{
@@ -175,23 +172,16 @@ func TestBlockClient(t *testing.T) {
 				id:         "some_id",
 				want: &notionapi.ChildPageBlock{
 					BasicBlock: notionapi.BasicBlock{
-						Object:         notionapi.ObjectTypeBlock,
-						ID:             "some_id",
-						Type:           notionapi.BlockTypeChildPage,
-						CreatedTime:    &timestamp,
-						LastEditedTime: &timestamp,
-						CreatedBy: &notionapi.User{
-							Object: "user",
-							ID:     "some_id",
-						},
-						LastEditedBy: &notionapi.User{
-							Object: "user",
-							ID:     "some_id",
-						},
 						HasChildren: true,
-						Parent: &notionapi.Parent{
-							Type:   "page_id",
-							PageID: "59833787-2cf9-4fdf-8782-e53db20768a5",
+						Type:        notionapi.BlockTypeChildPage,
+						DataObjectAtom: notionapi.DataObjectAtom{
+							Object:         notionapi.ObjectTypeBlock,
+							ID:             "some_id",
+							CreatedTime:    &timestamp,
+							LastEditedTime: &timestamp,
+							CreatedBy:      user,
+							LastEditedBy:   user,
+							Parent:         notionapi.NewPageParent("59833787-2cf9-4fdf-8782-e53db20768a5"),
 						},
 					},
 					ChildPage: struct {
@@ -250,11 +240,13 @@ func TestBlockClient(t *testing.T) {
 				},
 				want: &notionapi.ParagraphBlock{
 					BasicBlock: notionapi.BasicBlock{
-						Object:         notionapi.ObjectTypeBlock,
-						ID:             "some_id",
-						Type:           notionapi.BlockTypeParagraph,
-						CreatedTime:    &timestamp,
-						LastEditedTime: &timestamp,
+						Type: notionapi.BlockTypeParagraph,
+						DataObjectAtom: notionapi.DataObjectAtom{
+							Object:         notionapi.ObjectTypeBlock,
+							ID:             "some_id",
+							CreatedTime:    &timestamp,
+							LastEditedTime: &timestamp,
+						},
 					},
 					Paragraph: notionapi.Paragraph{
 						RichText: []notionapi.RichText{
@@ -300,10 +292,8 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 	}
 
 	var emoji notionapi.Emoji = "📌"
-	var user *notionapi.User = &notionapi.User{
-		Object: "user",
-		ID:     "some_id",
-	}
+	user := notionapi.NewUser("some_id")
+
 	t.Run("BlockArray", func(t *testing.T) {
 		tests := []struct {
 			name     string
@@ -318,13 +308,15 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 				want: notionapi.Blocks{
 					&notionapi.CalloutBlock{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block1",
-							Type:           "callout",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
+							Type: notionapi.BlockTypeCallout,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block1",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 						Callout: notionapi.Callout{
 							RichText: []notionapi.RichText{
@@ -358,13 +350,15 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 					},
 					&notionapi.Heading1Block{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block2",
-							Type:           "heading_1",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
+							Type: notionapi.BlockTypeHeading1,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block2",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 						Heading1: notionapi.Heading{
 							RichText: []notionapi.RichText{
@@ -384,13 +378,15 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 					},
 					&notionapi.ChildDatabaseBlock{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block3",
-							Type:           "child_database",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
+							Type: notionapi.BlockTypeChildDatabase,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block3",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 						ChildDatabase: struct {
 							Title string "json:\"title\""
@@ -400,25 +396,29 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 					},
 					&notionapi.ColumnListBlock{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block4",
-							Type:           "column_list",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
-							HasChildren:    true,
+							Type:        "column_list",
+							HasChildren: true,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block4",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 					},
 					&notionapi.Heading3Block{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block5",
-							Type:           "heading_3",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
+							Type: notionapi.BlockTypeHeading3,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block5",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 						Heading3: notionapi.Heading{
 							RichText: []notionapi.RichText{
@@ -439,13 +439,15 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 					},
 					&notionapi.ParagraphBlock{
 						BasicBlock: notionapi.BasicBlock{
-							Object:         "block",
-							ID:             "block6",
-							Type:           "paragraph",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
+							Type: notionapi.BlockTypeParagraph,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypeBlock,
+								ID:             "block6",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+							},
 						},
 						Paragraph: notionapi.Paragraph{
 							RichText: []notionapi.RichText{
@@ -469,7 +471,7 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				data, err := ioutil.ReadFile(tt.filePath)
+				data, err := os.ReadFile(tt.filePath)
 				if err != nil {
 					t.Fatal(err)
 				}

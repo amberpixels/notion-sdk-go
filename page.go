@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 )
 
 type PageID string
@@ -148,40 +147,19 @@ type PageUpdateRequest struct {
 //
 // See https://developers.notion.com/reference/page
 type Page struct {
-	Object         ObjectType `json:"object"`
-	ID             ObjectID   `json:"id"`
-	CreatedTime    time.Time  `json:"created_time"`
-	LastEditedTime time.Time  `json:"last_edited_time"`
-	CreatedBy      User       `json:"created_by,omitempty"`
-	LastEditedBy   User       `json:"last_edited_by,omitempty"`
-	Archived       bool       `json:"archived"`
-	Properties     Properties `json:"properties"`
-	Parent         Parent     `json:"parent"`
-	URL            string     `json:"url"`
-	PublicURL      string     `json:"public_url"`
-	Icon           *Icon      `json:"icon,omitempty"`
-	Cover          *Image     `json:"cover,omitempty"`
+	DataObjectAtom
+	ContentMediaAtom
+
+	Properties Properties `json:"properties"`
+
+	URL       string `json:"url"`
+	PublicURL string `json:"public_url"`
 }
 
-func (p *Page) GetObject() ObjectType {
-	return p.Object
-}
+var _ DataObject = (*Page)(nil)
+var _ ContentMedia = (*Page)(nil)
 
-type ParentType string
-
-// Pages, databases, and blocks are either located inside other pages,
-// databases, and blocks, or are located at the top level of a workspace. This
-// location is known as the "parent". Parent information is represented by a
-// consistent parent object throughout the API.
-//
-// See https://developers.notion.com/reference/parent-object
-type Parent struct {
-	Type       ParentType `json:"type,omitempty"`
-	PageID     PageID     `json:"page_id,omitempty"`
-	DatabaseID DatabaseID `json:"database_id,omitempty"`
-	BlockID    BlockID    `json:"block_id,omitempty"`
-	Workspace  bool       `json:"workspace,omitempty"`
-}
+func (p *Page) GetObject() ObjectType { return ObjectTypePage }
 
 func handlePageResponse(res *http.Response) (*Page, error) {
 	var response Page

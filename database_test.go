@@ -18,10 +18,7 @@ func TestDatabaseClient(t *testing.T) {
 
 	emoji := notionapi.Emoji("🎉")
 
-	var user = notionapi.User{
-		Object: "user",
-		ID:     "some_id",
-	}
+	user := notionapi.NewUser("some_id")
 
 	t.Run("Get", func(t *testing.T) {
 		tests := []struct {
@@ -39,12 +36,14 @@ func TestDatabaseClient(t *testing.T) {
 				filePath:   "testdata/database_get.json",
 				statusCode: http.StatusOK,
 				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy:      user,
-					LastEditedBy:   user,
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypeDatabase,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+					},
 					Title: []notionapi.RichText{
 						{
 							Type:        notionapi.ObjectTypeText,
@@ -120,20 +119,19 @@ func TestDatabaseClient(t *testing.T) {
 				},
 				want: &notionapi.DatabaseQueryResponse{
 					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.Page{
+					Results: []notionapi.Database{
 						{
-							Object:         notionapi.ObjectTypePage,
-							ID:             "some_id",
-							CreatedTime:    timestamp,
-							LastEditedTime: timestamp,
-							CreatedBy:      user,
-							LastEditedBy:   user,
-							Parent: notionapi.Parent{
-								Type:       notionapi.ParentTypeDatabaseID,
-								DatabaseID: "some_id",
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object:         notionapi.ObjectTypePage,
+								ID:             "some_id",
+								CreatedTime:    &timestamp,
+								LastEditedTime: &timestamp,
+								CreatedBy:      user,
+								LastEditedBy:   user,
+								Parent:         notionapi.NewPageParent("some_id"),
 							},
-							Archived: false,
-							URL:      "some_url",
+
+							URL: "some_url",
 						},
 					},
 					HasMore:    false,
@@ -190,16 +188,29 @@ func TestDatabaseClient(t *testing.T) {
 					},
 				},
 				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy:      user,
-					LastEditedBy:   user,
-					Parent: notionapi.Parent{
-						Type:   "page_id",
-						PageID: "48f8fee9-cd79-4180-bc2f-ec0398253067",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypeDatabase,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewPageParent("48f8fee9-cd79-4180-bc2f-ec0398253067"),
 					},
+
+					ContentMediaAtom: notionapi.ContentMediaAtom{
+						Icon: &notionapi.Icon{
+							Type:  "emoji",
+							Emoji: &emoji,
+						},
+						Cover: &notionapi.Image{
+							Type: "external",
+							External: &notionapi.FileObject{
+								URL: "https://website.domain/images/image.png",
+							},
+						},
+					},
+
 					Title: []notionapi.RichText{
 						{
 							Type: notionapi.ObjectTypeText,
@@ -208,17 +219,6 @@ func TestDatabaseClient(t *testing.T) {
 					},
 					Description: []notionapi.RichText{},
 					IsInline:    false,
-					Archived:    false,
-					Icon: &notionapi.Icon{
-						Type:  "emoji",
-						Emoji: &emoji,
-					},
-					Cover: &notionapi.Image{
-						Type: "external",
-						External: &notionapi.FileObject{
-							URL: "https://website.domain/images/image.png",
-						},
-					},
 				},
 			},
 		}
@@ -274,15 +274,26 @@ func TestDatabaseClient(t *testing.T) {
 					IsInline: false,
 				},
 				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy:      user,
-					LastEditedBy:   user,
-					Parent: notionapi.Parent{
-						Type:   "page_id",
-						PageID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypeDatabase,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewPageParent("a7744006-9233-4cd0-bf44-3a49de2c01b5"),
+					},
+					ContentMediaAtom: notionapi.ContentMediaAtom{
+						Icon: &notionapi.Icon{
+							Type:  "emoji",
+							Emoji: &emoji,
+						},
+						Cover: &notionapi.Image{
+							Type: "external",
+							External: &notionapi.FileObject{
+								URL: "https://website.domain/images/image.png",
+							},
+						},
 					},
 					Title: []notionapi.RichText{
 						{
@@ -293,18 +304,6 @@ func TestDatabaseClient(t *testing.T) {
 						},
 					},
 					Description: []notionapi.RichText{},
-					IsInline:    false,
-					Archived:    false,
-					Icon: &notionapi.Icon{
-						Type:  "emoji",
-						Emoji: &emoji,
-					},
-					Cover: &notionapi.Image{
-						Type: "external",
-						External: &notionapi.FileObject{
-							URL: "https://website.domain/images/image.png",
-						},
-					},
 				},
 			},
 			{
@@ -330,16 +329,28 @@ func TestDatabaseClient(t *testing.T) {
 					IsInline: false,
 				},
 				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy:      user,
-					LastEditedBy:   user,
-					Parent: notionapi.Parent{
-						Type:    "block_id",
-						BlockID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypeDatabase,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewBlockParent("a7744006-9233-4cd0-bf44-3a49de2c01b5"),
 					},
+					ContentMediaAtom: notionapi.ContentMediaAtom{
+						Icon: &notionapi.Icon{
+							Type:  "emoji",
+							Emoji: &emoji,
+						},
+						Cover: &notionapi.Image{
+							Type: "external",
+							External: &notionapi.FileObject{
+								URL: "https://website.domain/images/image.png",
+							},
+						},
+					},
+
 					Title: []notionapi.RichText{
 						{
 							Type:        notionapi.ObjectTypeText,
@@ -349,18 +360,6 @@ func TestDatabaseClient(t *testing.T) {
 						},
 					},
 					Description: []notionapi.RichText{},
-					IsInline:    false,
-					Archived:    false,
-					Icon: &notionapi.Icon{
-						Type:  "emoji",
-						Emoji: &emoji,
-					},
-					Cover: &notionapi.Image{
-						Type: "external",
-						External: &notionapi.FileObject{
-							URL: "https://website.domain/images/image.png",
-						},
-					},
 				},
 			},
 			{
@@ -386,16 +385,28 @@ func TestDatabaseClient(t *testing.T) {
 					IsInline: true,
 				},
 				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy:      user,
-					LastEditedBy:   user,
-					Parent: notionapi.Parent{
-						Type:   "page_id",
-						PageID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypeDatabase,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewPageParent("a7744006-9233-4cd0-bf44-3a49de2c01b5"),
 					},
+					ContentMediaAtom: notionapi.ContentMediaAtom{
+						Icon: &notionapi.Icon{
+							Type:  "emoji",
+							Emoji: &emoji,
+						},
+						Cover: &notionapi.Image{
+							Type: "external",
+							External: &notionapi.FileObject{
+								URL: "https://website.domain/images/image.png",
+							},
+						},
+					},
+
 					Title: []notionapi.RichText{
 						{
 							Type:        notionapi.ObjectTypeText,
@@ -406,17 +417,6 @@ func TestDatabaseClient(t *testing.T) {
 					},
 					Description: []notionapi.RichText{},
 					IsInline:    true,
-					Archived:    false,
-					Icon: &notionapi.Icon{
-						Type:  "emoji",
-						Emoji: &emoji,
-					},
-					Cover: &notionapi.Image{
-						Type: "external",
-						External: &notionapi.FileObject{
-							URL: "https://website.domain/images/image.png",
-						},
-					},
 				},
 			},
 		}

@@ -111,6 +111,13 @@ type User struct {
 	Bot       *Bot       `json:"bot,omitempty"`
 }
 
+func NewUser(id UserID) *User {
+	return &User{
+		Object: ObjectTypeUser,
+		ID:     id,
+	}
+}
+
 type Person struct {
 	Email string `json:"email"`
 }

@@ -12,6 +12,8 @@ import (
 )
 
 func TestPageClient(t *testing.T) {
+	user := notionapi.NewUser("some_id")
+
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
 	if err != nil {
 		t.Fatal(err)
@@ -33,24 +35,17 @@ func TestPageClient(t *testing.T) {
 				filePath:   "testdata/page_get.json",
 				statusCode: http.StatusOK,
 				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypePage,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewDatabaseParent("some_id"),
 					},
-					LastEditedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
-					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
-						DatabaseID: "some_id",
-					},
-					Archived: false,
-					URL:      "some_url",
+
+					URL: "some_url",
 					Properties: notionapi.Properties{
 						"Tags": &notionapi.MultiSelectProperty{
 							ID:   ";s|V",
@@ -213,24 +208,16 @@ func TestPageClient(t *testing.T) {
 					},
 				},
 				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypePage,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewDatabaseParent("some_id"),
 					},
-					LastEditedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
-					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
-						DatabaseID: "some_id",
-					},
-					Archived: false,
-					URL:      "some_url",
+					URL: "some_url",
 				},
 			},
 		}
@@ -302,24 +289,17 @@ func TestPageClient(t *testing.T) {
 					},
 				},
 				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
+					DataObjectAtom: notionapi.DataObjectAtom{
+						Object:         notionapi.ObjectTypePage,
+						ID:             "some_id",
+						CreatedTime:    &timestamp,
+						LastEditedTime: &timestamp,
+						CreatedBy:      user,
+						LastEditedBy:   user,
+						Parent:         notionapi.NewDatabaseParent("some_id"),
 					},
-					LastEditedBy: notionapi.User{
-						Object: "user",
-						ID:     "some_id",
-					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
-						DatabaseID: "some_id",
-					},
-					Archived: false,
-					URL:      "some_url",
+
+					URL: "some_url",
 				},
 			},
 		}
@@ -454,8 +434,10 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 				Children: []notionapi.Block{
 					notionapi.Heading2Block{
 						BasicBlock: notionapi.BasicBlock{
-							Object: notionapi.ObjectTypeBlock,
-							Type:   notionapi.BlockTypeHeading2,
+							Type: notionapi.BlockTypeHeading2,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object: notionapi.ObjectTypeBlock,
+							},
 						},
 						Heading2: notionapi.Heading{
 							RichText: []notionapi.RichText{
@@ -468,8 +450,10 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 					},
 					notionapi.ParagraphBlock{
 						BasicBlock: notionapi.BasicBlock{
-							Object: notionapi.ObjectTypeBlock,
-							Type:   notionapi.BlockTypeParagraph,
+							Type: notionapi.BlockTypeParagraph,
+							DataObjectAtom: notionapi.DataObjectAtom{
+								Object: notionapi.ObjectTypeBlock,
+							},
 						},
 						Paragraph: notionapi.Paragraph{
 							RichText: []notionapi.RichText{

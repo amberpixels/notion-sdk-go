@@ -1,9 +1,10 @@
-package notionast
+package notionast_test
 
 import (
 	"testing"
 
 	notion "github.com/amberpixels/notion-sdk-go"
+	notionast "github.com/amberpixels/notion-sdk-go/x/notionast"
 )
 
 func TestFromBlocks(t *testing.T) {
@@ -21,10 +22,9 @@ func TestFromBlocks(t *testing.T) {
 
 	blocks := notion.Blocks{paragraphBlock}
 
-	// Build the tree
-	node := FromBlocks(blocks, nil)
+	node := notionast.BlocksToAST(blocks, nil)
 
-	PrintAST(node)
+	notionast.PrintAST(node)
 
 	/* Expected output:
 	- [tmp-0000000000] paragraph

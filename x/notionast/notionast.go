@@ -217,8 +217,8 @@ func (n *NodeBlock) RemoveChild(childNode Node) {
 	child.next = nil
 }
 
-// FromBlocks creates a new AST from the given notion.Blocks
-func FromBlocks(blocks notion.Blocks, parentArg ...*NodeBlock) Node {
+// BlocksToAST creates a new AST from the given notion.Blocks
+func BlocksToAST(blocks notion.Blocks, parentArg ...*NodeBlock) *NodeBlock {
 	var parent *NodeBlock
 	if len(parentArg) > 0 && parentArg[0] != nil {
 		parent = parentArg[0]
@@ -234,7 +234,7 @@ func FromBlocks(blocks notion.Blocks, parentArg ...*NodeBlock) Node {
 
 		// Recursively process children if the block has them
 		if block.GetHasChildren() {
-			if deeper := FromBlocks(notion.GetChildren(block), node); deeper.GetChildCount() > 0 {
+			if deeper := BlocksToAST(notion.GetChildren(block), node); deeper.GetChildCount() > 0 {
 				node.firstChild = deeper.GetFirstChild().(*NodeBlock)
 				node.lastChild = deeper.GetLastChild().(*NodeBlock)
 			}
@@ -258,8 +258,8 @@ func FromBlocks(blocks notion.Blocks, parentArg ...*NodeBlock) Node {
 	return parent
 }
 
-// ToBlocks converts the AST to notion.Blocks
-func ToBlocks(n *NodeBlock) notion.Blocks {
+// ASTToBlocks converts the AST to notion.Blocks
+func ASTToBlocks(n *NodeBlock) notion.Blocks {
 	var blocks notion.Blocks
 
 	// Helper function to recursively traverse the AST
@@ -279,7 +279,7 @@ func ToBlocks(n *NodeBlock) notion.Blocks {
 
 		// Add children blocks recursively
 		if child := node.GetFirstChild(); child != nil {
-			children := ToBlocks(child.(*NodeBlock))
+			children := ASTToBlocks(child.(*NodeBlock))
 			notion.SetChildren(block, children) // Assuming notion.Block supports SetChildren()
 		}
 

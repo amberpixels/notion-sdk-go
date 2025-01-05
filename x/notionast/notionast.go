@@ -1,10 +1,13 @@
+// Package notionast provides a set of functions to work with Notion AST
+// It is used to convert notion.Blocks to AST and vice versa
+// It also provides Walk functionality to traverse the AST.
 package notionast
 
 import (
 	"cmp"
+	"crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"math/big"
 
 	notion "github.com/amberpixels/notion-sdk-go"
 )
@@ -33,6 +36,7 @@ type Node interface {
 	RemoveChildren() // removes all children
 }
 
+// Nodes is a slice of Node
 type Nodes []Node
 
 // NodeBlock is a node implementation for notion.Block
@@ -50,6 +54,7 @@ type NodeBlock struct {
 
 var _ Node = (*NodeBlock)(nil)
 
+// RootNodeID is a constant for the root node auto-generated ID
 const RootNodeID = "tmp-0000000000"
 
 // NewNodeBlock returns a new NodeBlock with the given block
@@ -70,9 +75,11 @@ func NewNodeBlock(block notion.Block, parent *NodeBlock) *NodeBlock {
 			NodeID(block.GetID()),
 			NodeID(newTmpIdentifier()),
 		),
+		parent: parent,
 	}
 }
 
+// IsRoot returns true if the node is the root node
 func (n *NodeBlock) IsRoot() bool { return n.parent == nil }
 
 // GetID returns the ID of the node.d
@@ -329,14 +336,15 @@ func indent(level int) string {
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+var nCharset = big.NewInt(int64(len(charset)))
+
 // newTmpIdentifier returns a temp random identifier
 // All nodes do have generated IDs, so we can compare them (when finding a node to be deleted, etc)
 func newTmpIdentifier() string {
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano())) // Create a local random generator
-
 	b := make([]byte, 10)
 	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
+		r, _ := rand.Int(rand.Reader, nCharset)
+		b[i] = charset[r.Uint64()]
 	}
 
 	return "tmp-" + string(b)

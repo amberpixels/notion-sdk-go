@@ -3,8 +3,8 @@ package notionast_test
 import (
 	"testing"
 
-	notion "github.com/amberpixels/notion-sdk-go"
-	notionast "github.com/amberpixels/notion-sdk-go/x/notionast"
+	"github.com/amberpixels/notion-sdk-go"
+	"github.com/amberpixels/notion-sdk-go/x/notionast"
 )
 
 func TestFromBlocks(t *testing.T) {
@@ -22,6 +22,7 @@ func TestFromBlocks(t *testing.T) {
 
 	blocks := notion.Blocks{paragraphBlock}
 
+	// Build the tree
 	node := notionast.BlocksToAST(blocks, nil)
 
 	notionast.PrintAST(node)
@@ -44,5 +45,42 @@ func TestFromBlocks(t *testing.T) {
 	}
 	if paragraphNode.GetChildCount() != 2 { // Paragraph node has 2 children
 		t.Fatalf("expected 2 children, got %d", paragraphNode.GetChildCount())
+	}
+
+	if paragraphNode.GetFirstChild() == nil {
+		t.Errorf("expected first child to be not nil")
+	}
+	if paragraphNode.GetLastChild() == nil {
+		t.Errorf("expected last child to be not nil")
+	}
+	firstChild := paragraphNode.GetFirstChild()
+	lastChild := paragraphNode.GetLastChild()
+	if firstChild.GetID() != "child1-id" {
+		t.Errorf("expected first child ID to be 'child1-id', got %s", firstChild.GetID())
+	}
+	if lastChild.GetID() != "child2-id" {
+		t.Errorf("expected last child ID to be 'child2-id', got %s", lastChild.GetID())
+	}
+	if firstChild.GetPrevSibling() != nil {
+		t.Errorf("expected first child prev sibling to be nil")
+	}
+	if lastChild.GetNextSibling() != nil {
+		t.Errorf("expected last child next sibling to be nil")
+	}
+
+	if firstChild.GetParent() == nil {
+		t.Errorf("expected first child parent to be nil")
+	} else {
+		if firstChild.GetParent() != paragraphNode {
+			t.Errorf("expected first child parent to be %s, got %s", paragraphNode.GetID(), firstChild.GetParent().GetID())
+		}
+	}
+
+	if lastChild.GetParent() == nil {
+		t.Errorf("expected last child parent to be nil")
+	} else {
+		if lastChild.GetParent() != paragraphNode {
+			t.Errorf("expected last child parent to be %s, got %s", paragraphNode.GetID(), lastChild.GetParent().GetID())
+		}
 	}
 }

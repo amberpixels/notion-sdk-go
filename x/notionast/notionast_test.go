@@ -5,20 +5,22 @@ import (
 
 	"github.com/amberpixels/notion-sdk-go"
 	"github.com/amberpixels/notion-sdk-go/x/notionast"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFromBlocks(t *testing.T) {
 	// Create blocks
 	childBlock1 := notion.NewParagraphBlock(notion.Paragraph{})
-	childBlock1.ID = "child1-id"
+	childBlock1.ID = notion.BlockID("child1-id")
 
 	childBlock2 := notion.NewParagraphBlock(notion.Paragraph{})
-	childBlock2.ID = "child2-id"
+	childBlock2.ID = notion.BlockID("child2-id")
 
 	paragraphBlock := notion.NewParagraphBlock(notion.Paragraph{
 		Children: notion.Blocks{childBlock1, childBlock2},
 	})
-	paragraphBlock.ID = "paragraph-id"
+	paragraphBlock.ID = notion.BlockID("paragraph-id")
 
 	blocks := notion.Blocks{paragraphBlock}
 
@@ -35,52 +37,28 @@ func TestFromBlocks(t *testing.T) {
 	*/
 
 	// Verify the tree structure
-	if node.GetChildCount() != 1 { // Root node has 1 child
-		t.Fatalf("expected 1 child, got %d", node.GetChildCount())
-	}
+	require.Equal(t, 1, node.GetChildCount(), "Root node should have 1 child")
 
 	paragraphNode := node.GetFirstChild()
-	if paragraphNode.GetID() != "paragraph-id" {
-		t.Errorf("expected paragraph ID to be 'paragraph-id', got %s", paragraphNode.GetID())
-	}
-	if paragraphNode.GetChildCount() != 2 { // Paragraph node has 2 children
-		t.Fatalf("expected 2 children, got %d", paragraphNode.GetChildCount())
-	}
+	require.NotNil(t, paragraphNode, "First child of root node should not be nil")
+	assert.Equal(t, "paragraph-id", paragraphNode.GetID().String(), "Paragraph node ID mismatch")
+	assert.Equal(t, 2, paragraphNode.GetChildCount(), "Paragraph node should have 2 children")
 
-	if paragraphNode.GetFirstChild() == nil {
-		t.Errorf("expected first child to be not nil")
-	}
-	if paragraphNode.GetLastChild() == nil {
-		t.Errorf("expected last child to be not nil")
-	}
 	firstChild := paragraphNode.GetFirstChild()
 	lastChild := paragraphNode.GetLastChild()
-	if firstChild.GetID() != "child1-id" {
-		t.Errorf("expected first child ID to be 'child1-id', got %s", firstChild.GetID())
-	}
-	if lastChild.GetID() != "child2-id" {
-		t.Errorf("expected last child ID to be 'child2-id', got %s", lastChild.GetID())
-	}
-	if firstChild.GetPrevSibling() != nil {
-		t.Errorf("expected first child prev sibling to be nil")
-	}
-	if lastChild.GetNextSibling() != nil {
-		t.Errorf("expected last child next sibling to be nil")
-	}
 
-	if firstChild.GetParent() == nil {
-		t.Errorf("expected first child parent to be nil")
-	} else {
-		if firstChild.GetParent() != paragraphNode {
-			t.Errorf("expected first child parent to be %s, got %s", paragraphNode.GetID(), firstChild.GetParent().GetID())
-		}
-	}
+	require.NotNil(t, firstChild, "First child of paragraph node should not be nil")
+	require.NotNil(t, lastChild, "Last child of paragraph node should not be nil")
 
-	if lastChild.GetParent() == nil {
-		t.Errorf("expected last child parent to be nil")
-	} else {
-		if lastChild.GetParent() != paragraphNode {
-			t.Errorf("expected last child parent to be %s, got %s", paragraphNode.GetID(), lastChild.GetParent().GetID())
-		}
-	}
+	assert.Equal(t, "child1-id", firstChild.GetID().String(), "First child ID mismatch")
+	assert.Equal(t, "child2-id", lastChild.GetID().String(), "Last child ID mismatch")
+
+	assert.Nil(t, firstChild.GetPrevSibling(), "First child's previous sibling should be nil")
+	assert.Nil(t, lastChild.GetNextSibling(), "Last child's next sibling should be nil")
+
+	assert.NotNil(t, firstChild.GetParent(), "First child's parent should not be nil")
+	assert.Equal(t, paragraphNode, firstChild.GetParent(), "First child's parent mismatch")
+
+	assert.NotNil(t, lastChild.GetParent(), "Last child's parent should not be nil")
+	assert.Equal(t, paragraphNode, lastChild.GetParent(), "Last child's parent mismatch")
 }

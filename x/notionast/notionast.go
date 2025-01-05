@@ -15,8 +15,12 @@ import (
 // NodeID is a unique identifier for a node
 type NodeID string
 
+func (n NodeID) String() string { return string(n) }
+
 // NodeType is a type of a node (It's considered to map to a block type)
 type NodeType string
+
+func (n NodeType) String() string { return string(n) }
 
 // Node is a generic interface for a node in the AST
 type Node interface {

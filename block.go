@@ -1131,86 +1131,63 @@ func (r *AppendBlockChildrenResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// nolint:gocyclo
 func decodeBlock(raw map[string]interface{}) (Block, error) {
-	var b Block
-	switch BlockType(raw["type"].(string)) {
-	case BlockTypeParagraph:
-		b = &ParagraphBlock{}
-	case BlockTypeHeading1:
-		b = &Heading1Block{}
-	case BlockTypeHeading2:
-		b = &Heading2Block{}
-	case BlockTypeHeading3:
-		b = &Heading3Block{}
-	case BlockTypeCallout:
-		b = &CalloutBlock{}
-	case BlockTypeQuote:
-		b = &QuoteBlock{}
-	case BlockTypeBulletedListItem:
-		b = &BulletedListItemBlock{}
-	case BlockTypeNumberedListItem:
-		b = &NumberedListItemBlock{}
-	case BlockTypeToDo:
-		b = &ToDoBlock{}
-	case BlockTypeCode:
-		b = &CodeBlock{}
-	case BlockTypeToggle:
-		b = &ToggleBlock{}
-	case BlockTypeChildPage:
-		b = &ChildPageBlock{}
-	case BlockTypeEmbed:
-		b = &EmbedBlock{}
-	case BlockTypeImage:
-		b = &ImageBlock{}
-	case BlockTypeAudio:
-		b = &AudioBlock{}
-	case BlockTypeVideo:
-		b = &VideoBlock{}
-	case BlockTypeFile:
-		b = &FileBlock{}
-	case BlockTypePdf:
-		b = &PdfBlock{}
-	case BlockTypeBookmark:
-		b = &BookmarkBlock{}
-	case BlockTypeChildDatabase:
-		b = &ChildDatabaseBlock{}
-	case BlockTypeTableOfContents:
-		b = &TableOfContentsBlock{}
-	case BlockTypeDivider:
-		b = &DividerBlock{}
-	case BlockTypeEquation:
-		b = &EquationBlock{}
-	case BlockTypeBreadcrumb:
-		b = &BreadcrumbBlock{}
-	case BlockTypeColumn:
-		b = &ColumnBlock{}
-	case BlockTypeColumnList:
-		b = &ColumnListBlock{}
-	case BlockTypeLinkPreview:
-		b = &LinkPreviewBlock{}
-	case BlockTypeLinkToPage:
-		b = &LinkToPageBlock{}
-	case BlockTypeTemplate:
-		b = &TemplateBlock{}
-	case BlockTypeSyncedBlock:
-		b = &SyncedBlock{}
-	case BlockTypeTable:
-		b = &TableBlock{}
-	case BlockTypeTableRow:
-		b = &TableRowBlock{}
-	case BlockTypeUnsupported:
-		b = &UnsupportedBlock{}
-	default:
-		return &UnsupportedBlock{}, nil
+	blockConstructors := map[BlockType]func() Block{
+		BlockTypeParagraph:        func() Block { return &ParagraphBlock{} },
+		BlockTypeHeading1:         func() Block { return &Heading1Block{} },
+		BlockTypeHeading2:         func() Block { return &Heading2Block{} },
+		BlockTypeHeading3:         func() Block { return &Heading3Block{} },
+		BlockTypeCallout:          func() Block { return &CalloutBlock{} },
+		BlockTypeQuote:            func() Block { return &QuoteBlock{} },
+		BlockTypeBulletedListItem: func() Block { return &BulletedListItemBlock{} },
+		BlockTypeNumberedListItem: func() Block { return &NumberedListItemBlock{} },
+		BlockTypeToDo:             func() Block { return &ToDoBlock{} },
+		BlockTypeCode:             func() Block { return &CodeBlock{} },
+		BlockTypeToggle:           func() Block { return &ToggleBlock{} },
+		BlockTypeChildPage:        func() Block { return &ChildPageBlock{} },
+		BlockTypeEmbed:            func() Block { return &EmbedBlock{} },
+		BlockTypeImage:            func() Block { return &ImageBlock{} },
+		BlockTypeAudio:            func() Block { return &AudioBlock{} },
+		BlockTypeVideo:            func() Block { return &VideoBlock{} },
+		BlockTypeFile:             func() Block { return &FileBlock{} },
+		BlockTypePdf:              func() Block { return &PdfBlock{} },
+		BlockTypeBookmark:         func() Block { return &BookmarkBlock{} },
+		BlockTypeChildDatabase:    func() Block { return &ChildDatabaseBlock{} },
+		BlockTypeTableOfContents:  func() Block { return &TableOfContentsBlock{} },
+		BlockTypeDivider:          func() Block { return &DividerBlock{} },
+		BlockTypeEquation:         func() Block { return &EquationBlock{} },
+		BlockTypeBreadcrumb:       func() Block { return &BreadcrumbBlock{} },
+		BlockTypeColumn:           func() Block { return &ColumnBlock{} },
+		BlockTypeColumnList:       func() Block { return &ColumnListBlock{} },
+		BlockTypeLinkPreview:      func() Block { return &LinkPreviewBlock{} },
+		BlockTypeLinkToPage:       func() Block { return &LinkToPageBlock{} },
+		BlockTypeTemplate:         func() Block { return &TemplateBlock{} },
+		BlockTypeSyncedBlock:      func() Block { return &SyncedBlock{} },
+		BlockTypeTable:            func() Block { return &TableBlock{} },
+		BlockTypeTableRow:         func() Block { return &TableRowBlock{} },
+		BlockTypeUnsupported:      func() Block { return &UnsupportedBlock{} },
 	}
+
+	blockType, ok := raw["type"].(string)
+	if !ok {
+		return nil, fmt.Errorf("invalid block type")
+	}
+
+	constructor, found := blockConstructors[BlockType(blockType)]
+	if !found {
+		constructor = func() Block { return &UnsupportedBlock{} } // Default to UnsupportedBlock
+	}
+
+	// Create the block
+	block := constructor()
+
 	j, err := json.Marshal(raw)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(j, b)
-	return b, err
+	err = json.Unmarshal(j, block)
+	return block, err
 }
 
 // GetChildren returns the children of the block.

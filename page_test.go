@@ -452,7 +452,7 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 					},
 				},
 				Children: []notionapi.Block{
-					notionapi.Heading2Block{
+					&notionapi.Heading2Block{
 						BasicBlock: notionapi.BasicBlock{
 							Object: notionapi.ObjectTypeBlock,
 							Type:   notionapi.BlockTypeHeading2,
@@ -466,7 +466,7 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 							},
 						},
 					},
-					notionapi.ParagraphBlock{
+					&notionapi.ParagraphBlock{
 						BasicBlock: notionapi.BasicBlock{
 							Object: notionapi.ObjectTypeBlock,
 							Type:   notionapi.BlockTypeParagraph,

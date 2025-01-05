@@ -219,6 +219,9 @@ type Block interface {
 	GetArchived() bool
 	GetParent() *Parent
 	GetRichTextString() string
+
+	GetChildren() Blocks
+	SetChildren(Blocks)
 }
 
 type Blocks []Block
@@ -245,6 +248,8 @@ func (b *Blocks) UnmarshalJSON(data []byte) error {
 // See https://developers.notion.com/reference/block for the list.
 // BasicBlock implements the Block interface.
 type BasicBlock struct {
+	ChildfreeAtom // blocks are by default child-free unless it's specified on the custom block implementation
+
 	Object         ObjectType `json:"object"`
 	ID             BlockID    `json:"id,omitempty"`
 	Type           BlockType  `json:"type"`
@@ -397,6 +402,106 @@ func (b BasicBlock) GetRichTextString() string {
 	return "No rich text of a basic block."
 }
 
+// Children holders can get/set children of the block.//
+func (p ParagraphBlock) GetChildren() Blocks          { return p.Paragraph.Children }
+func (p *ParagraphBlock) SetChildren(children Blocks) { p.Paragraph.Children = children; p.Refresh() }
+
+func (h Heading1Block) GetChildren() Blocks          { return h.Heading1.Children }
+func (h *Heading1Block) SetChildren(children Blocks) { h.Heading1.Children = children; h.Refresh() }
+func (h Heading2Block) GetChildren() Blocks          { return h.Heading2.Children }
+func (h *Heading2Block) SetChildren(children Blocks) { h.Heading2.Children = children; h.Refresh() }
+func (h Heading3Block) GetChildren() Blocks          { return h.Heading3.Children }
+func (h *Heading3Block) SetChildren(children Blocks) { h.Heading3.Children = children; h.Refresh() }
+
+func (c CalloutBlock) GetChildren() Blocks          { return c.Callout.Children }
+func (b *CalloutBlock) SetChildren(children Blocks) { b.Callout.Children = children; b.Refresh() }
+
+func (q QuoteBlock) GetChildren() Blocks          { return q.Quote.Children }
+func (b *QuoteBlock) SetChildren(children Blocks) { b.Quote.Children = children; b.Refresh() }
+
+func (b BulletedListItemBlock) GetChildren() Blocks { return b.BulletedListItem.Children }
+func (b *BulletedListItemBlock) SetChildren(children Blocks) {
+	b.BulletedListItem.Children = children
+	b.Refresh()
+}
+
+func (n NumberedListItemBlock) GetChildren() Blocks { return n.NumberedListItem.Children }
+func (b *NumberedListItemBlock) SetChildren(children Blocks) {
+	b.NumberedListItem.Children = children
+	b.Refresh()
+}
+
+func (t ToDoBlock) GetChildren() Blocks          { return t.ToDo.Children }
+func (b *ToDoBlock) SetChildren(children Blocks) { b.ToDo.Children = children; b.Refresh() }
+
+func (b ToggleBlock) GetChildren() Blocks          { return b.Toggle.Children }
+func (b *ToggleBlock) SetChildren(children Blocks) { b.Toggle.Children = children; b.Refresh() }
+
+func (t TableBlock) GetChildren() Blocks          { return t.Table.Children }
+func (b *TableBlock) SetChildren(children Blocks) { b.Table.Children = children; b.Refresh() }
+
+func (b ColumnBlock) GetChildren() Blocks              { return b.Column.Children }
+func (b *ColumnBlock) SetChildren(children Blocks)     { b.Column.Children = children; b.Refresh() }
+func (b ColumnListBlock) GetChildren() Blocks          { return b.ColumnList.Children }
+func (b *ColumnListBlock) SetChildren(children Blocks) { b.ColumnList.Children = children; b.Refresh() }
+
+func (b TemplateBlock) GetChildren() Blocks          { return b.Template.Children }
+func (b *TemplateBlock) SetChildren(children Blocks) { b.Template.Children = children; b.Refresh() }
+
+func (b SyncedBlock) GetChildren() Blocks          { return b.SyncedBlock.Children }
+func (b *SyncedBlock) SetChildren(children Blocks) { b.SyncedBlock.Children = children; b.Refresh() }
+
+// As We can add/delete children to/from blocks on-the-fly, we need to ensure that HasChildren field is updated
+// Use Refresh() for that
+func (p *ParagraphBlock) Refresh() *ParagraphBlock {
+	p.HasChildren = len(p.Paragraph.Children) > 0
+	return p
+}
+func (h *Heading1Block) Refresh() *Heading1Block {
+	h.HasChildren = len(h.Heading1.Children) > 0
+	return h
+}
+func (h *Heading2Block) Refresh() *Heading2Block {
+	h.HasChildren = len(h.Heading2.Children) > 0
+	return h
+}
+func (h *Heading3Block) Refresh() *Heading3Block {
+	h.HasChildren = len(h.Heading3.Children) > 0
+	return h
+}
+func (c *CalloutBlock) Refresh() *CalloutBlock { c.HasChildren = len(c.Callout.Children) > 0; return c }
+func (q *QuoteBlock) Refresh() *QuoteBlock     { q.HasChildren = len(q.Quote.Children) > 0; return q }
+func (b *BulletedListItemBlock) Refresh() *BulletedListItemBlock {
+	b.HasChildren = len(b.BulletedListItem.Children) > 0
+	return b
+}
+func (n *NumberedListItemBlock) Refresh() *NumberedListItemBlock {
+	n.HasChildren = len(n.NumberedListItem.Children) > 0
+	return n
+}
+func (t *ToDoBlock) Refresh() *ToDoBlock     { t.HasChildren = len(t.ToDo.Children) > 0; return t }
+func (b *ToggleBlock) Refresh() *ToggleBlock { b.HasChildren = len(b.Toggle.Children) > 0; return b }
+func (t *TableBlock) Refresh() *TableBlock   { t.HasChildren = len(t.Table.Children) > 0; return t }
+func (b *ColumnBlock) Refresh() *ColumnBlock { b.HasChildren = len(b.Column.Children) > 0; return b }
+func (b *ColumnListBlock) Refresh() *ColumnListBlock {
+	b.HasChildren = len(b.ColumnList.Children) > 0
+	return b
+}
+func (b *TemplateBlock) Refresh() *TemplateBlock {
+	b.HasChildren = len(b.Template.Children) > 0
+	return b
+}
+func (b *SyncedBlock) Refresh() *SyncedBlock {
+	b.HasChildren = len(b.SyncedBlock.Children) > 0
+	return b
+}
+
+// Childfree blocks are declared via given atom
+type ChildfreeAtom struct{}
+
+func (ChildfreeAtom) GetChildren() Blocks { return nil }
+func (ChildfreeAtom) SetChildren(Blocks)  {}
+
 var _ Block = (*BasicBlock)(nil)
 
 type ParagraphBlock struct {
@@ -411,10 +516,10 @@ type Paragraph struct {
 }
 
 func NewParagraphBlock(paragraph Paragraph) *ParagraphBlock {
-	return &ParagraphBlock{
+	return (&ParagraphBlock{
 		BasicBlock: NewBasicBlock(BlockTypeParagraph),
 		Paragraph:  paragraph,
-	}
+	}).Refresh()
 }
 
 type Heading1Block struct {
@@ -430,10 +535,10 @@ type Heading struct {
 }
 
 func NewHeading1Block(heading1 Heading) *Heading1Block {
-	return &Heading1Block{
+	return (&Heading1Block{
 		BasicBlock: NewBasicBlock(BlockTypeHeading1),
 		Heading1:   heading1,
-	}
+	}).Refresh()
 }
 
 type Heading2Block struct {
@@ -442,10 +547,10 @@ type Heading2Block struct {
 }
 
 func NewHeading2Block(heading2 Heading) *Heading2Block {
-	return &Heading2Block{
+	return (&Heading2Block{
 		BasicBlock: NewBasicBlock(BlockTypeHeading2),
 		Heading2:   heading2,
-	}
+	}).Refresh()
 }
 
 type Heading3Block struct {
@@ -454,10 +559,10 @@ type Heading3Block struct {
 }
 
 func NewHeading3Block(heading3 Heading) *Heading3Block {
-	return &Heading3Block{
+	return (&Heading3Block{
 		BasicBlock: NewBasicBlock(BlockTypeHeading3),
 		Heading3:   heading3,
-	}
+	}).Refresh()
 }
 
 // NewHeadingBlock returns a new Heading[1-3]Block (hidden below Block interface)
@@ -490,10 +595,10 @@ type Callout struct {
 }
 
 func NewCalloutBlock(callout Callout) *CalloutBlock {
-	return &CalloutBlock{
+	return (&CalloutBlock{
 		BasicBlock: NewBasicBlock(BlockTypeCallout),
 		Callout:    callout,
-	}
+	}).Refresh()
 }
 
 type QuoteBlock struct {
@@ -508,10 +613,10 @@ type Quote struct {
 }
 
 func NewQuoteBlock(quote Quote) *QuoteBlock {
-	return &QuoteBlock{
+	return (&QuoteBlock{
 		BasicBlock: NewBasicBlock(BlockTypeQuote),
 		Quote:      quote,
-	}
+	}).Refresh()
 }
 
 type TableBlock struct {
@@ -543,10 +648,10 @@ func NewTableRowBlock(tr TableRow) *TableRowBlock {
 }
 
 func NewTableBlock(table Table) *TableBlock {
-	return &TableBlock{
+	return (&TableBlock{
 		BasicBlock: NewBasicBlock(BlockTypeTable),
 		Table:      table,
-	}
+	}).Refresh()
 }
 
 type BulletedListItemBlock struct {
@@ -561,10 +666,10 @@ type ListItem struct {
 }
 
 func NewBulletedListItemBlock(li ListItem) *BulletedListItemBlock {
-	return &BulletedListItemBlock{
+	return (&BulletedListItemBlock{
 		BasicBlock:       NewBasicBlock(BlockTypeBulletedListItem),
 		BulletedListItem: li,
-	}
+	}).Refresh()
 }
 
 type NumberedListItemBlock struct {
@@ -573,10 +678,10 @@ type NumberedListItemBlock struct {
 }
 
 func NewNumberedListItemBlock(li ListItem) *NumberedListItemBlock {
-	return &NumberedListItemBlock{
+	return (&NumberedListItemBlock{
 		BasicBlock:       NewBasicBlock(BlockTypeNumberedListItem),
 		NumberedListItem: li,
-	}
+	}).Refresh()
 }
 
 type ToDoBlock struct {
@@ -592,10 +697,10 @@ type ToDo struct {
 }
 
 func NewToDoBlock(t ToDo) *ToDoBlock {
-	return &ToDoBlock{
+	return (&ToDoBlock{
 		BasicBlock: NewBasicBlock(BlockTypeToDo),
 		ToDo:       t,
-	}
+	}).Refresh()
 }
 
 type ToggleBlock struct {
@@ -610,10 +715,10 @@ type Toggle struct {
 }
 
 func NewToggleBlock(toggle Toggle) *ToggleBlock {
-	return &ToggleBlock{
+	return (&ToggleBlock{
 		BasicBlock: NewBasicBlock(BlockTypeToggle),
 		Toggle:     toggle,
-	}
+	}).Refresh()
 }
 
 type ChildPageBlock struct {
@@ -1104,4 +1209,26 @@ func decodeBlock(raw map[string]interface{}) (Block, error) {
 
 	err = json.Unmarshal(j, b)
 	return b, err
+}
+
+// GetChildren returns the children of the block.
+func GetChildren(b Block) Blocks {
+	if childrenHolder := b.(interface {
+		GetChildren() Blocks
+	}); childrenHolder != nil {
+		return childrenHolder.GetChildren()
+	}
+
+	return nil
+}
+
+// SetChildren sets the children of the block.
+func SetChildren(b Block, children Blocks) {
+	if childrenHolder := b.(interface {
+		SetChildren(Blocks)
+	}); childrenHolder != nil {
+		childrenHolder.SetChildren(children)
+		return
+	}
+	return
 }

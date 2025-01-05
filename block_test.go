@@ -55,6 +55,7 @@ func TestBlockClient(t *testing.T) {
 	})
 
 	t.Run("AppendChildren", func(t *testing.T) {
+
 		tests := []struct {
 			name       string
 			filePath   string
@@ -94,39 +95,37 @@ func TestBlockClient(t *testing.T) {
 				},
 				want: &notionapi.AppendBlockChildrenResponse{
 					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.Block{
-						notionapi.ParagraphBlock{
-							BasicBlock: notionapi.BasicBlock{
-								Object:         notionapi.ObjectTypeBlock,
-								ID:             "some_id",
-								CreatedTime:    &timestamp,
-								LastEditedTime: &timestamp,
-								Type:           notionapi.BlockTypeParagraph,
-								CreatedBy: &notionapi.User{
-									Object: "user",
-									ID:     "some_id",
-								},
-								LastEditedBy: &notionapi.User{
-									Object: "user",
-									ID:     "some_id",
-								},
+					Results: []notionapi.Block{&notionapi.ParagraphBlock{
+						BasicBlock: notionapi.BasicBlock{
+							Object:         notionapi.ObjectTypeBlock,
+							ID:             "some_id",
+							CreatedTime:    &timestamp,
+							LastEditedTime: &timestamp,
+							Type:           notionapi.BlockTypeParagraph,
+							CreatedBy: &notionapi.User{
+								Object: "user",
+								ID:     "some_id",
 							},
-							Paragraph: notionapi.Paragraph{
-								RichText: []notionapi.RichText{
-									{
-										Type: notionapi.RichTextTypeText,
-										Text: &notionapi.Text{Content: "AAAAAA"},
-										Annotations: &notionapi.Annotations{
-											Bold:  true,
-											Color: notionapi.ColorDefault,
-										},
-										PlainText: "AAAAAA",
-									},
-								},
-								Color: "blue",
+							LastEditedBy: &notionapi.User{
+								Object: "user",
+								ID:     "some_id",
 							},
 						},
-					},
+						Paragraph: notionapi.Paragraph{
+							RichText: []notionapi.RichText{
+								{
+									Type: notionapi.RichTextTypeText,
+									Text: &notionapi.Text{Content: "AAAAAA"},
+									Annotations: &notionapi.Annotations{
+										Bold:  true,
+										Color: notionapi.ColorDefault,
+									},
+									PlainText: "AAAAAA",
+								},
+							},
+							Color: "blue",
+						},
+					}},
 				},
 			},
 		}

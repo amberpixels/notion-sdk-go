@@ -5,33 +5,40 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.23'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.23"
 
-    - name: Check Formatting
-      run: |
-        go fmt ./...
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "Code is not properly formatted. Run 'go fmt ./...' locally before committing."
-          git diff
-          exit 1
-        fi
-        
-    - name: Vet
-      run: go vet ./...
+      - name: Install Dependencies
+        run: |
+          go mod tidy
+          go mod download
 
-    - name: Test
-      run: go test -v ./...
+      - name: Check Formatting
+        run: |
+          go fmt ./...
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Code is not properly formatted. Run 'go fmt ./...' locally before committing."
+            git diff
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: go test -v ./...

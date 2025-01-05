@@ -1,16 +1,16 @@
-package notionapi_test
+package notion_test
 
 import (
 	"encoding/json"
 	"reflect"
 	"testing"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestDate(t *testing.T) {
 	t.Run(".UnmarshalText", func(t *testing.T) {
-		var d notionapi.Date
+		var d notion.Date
 
 		t.Run("OK datetime with timezone", func(t *testing.T) {
 			data := []byte("1987-02-13T00:00:00.000+01:00")
@@ -38,11 +38,11 @@ func TestDate(t *testing.T) {
 
 func TestColor_MarshalText(t *testing.T) {
 	type Foo struct {
-		Test notionapi.Color `json:"test"`
+		Test notion.Color `json:"test"`
 	}
 
 	t.Run("marshall to color if color is not empty", func(t *testing.T) {
-		f := Foo{Test: notionapi.ColorGreen}
+		f := Foo{Test: notion.ColorGreen}
 		r, err := json.Marshal(f)
 		if err != nil {
 			t.Fatal(err)

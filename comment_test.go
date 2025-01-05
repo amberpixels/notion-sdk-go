@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestCommentClient(t *testing.T) {
@@ -16,7 +16,7 @@ func TestCommentClient(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var user = notionapi.User{
+	var user = notion.User{
 		Object: "user",
 		ID:     "some_id",
 	}
@@ -26,8 +26,8 @@ func TestCommentClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.BlockID
-			want       *notionapi.CommentQueryResponse
+			id         notion.BlockID
+			want       *notion.CommentQueryResponse
 			wantErr    bool
 			err        error
 		}{
@@ -36,42 +36,42 @@ func TestCommentClient(t *testing.T) {
 				filePath:   "testdata/comment_get.json",
 				statusCode: http.StatusOK,
 				id:         "some_id",
-				want: &notionapi.CommentQueryResponse{
-					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.Comment{
+				want: &notion.CommentQueryResponse{
+					Object: notion.ObjectTypeList,
+					Results: []notion.Comment{
 						{
-							Object:         notionapi.ObjectTypeComment,
+							Object:         notion.ObjectTypeComment,
 							ID:             "some_id",
 							DiscussionID:   "some_id",
 							CreatedTime:    timestamp,
 							LastEditedTime: timestamp,
 							CreatedBy:      user,
-							Parent: notionapi.Parent{
-								Type:   notionapi.ParentTypePageID,
+							Parent: notion.Parent{
+								Type:   notion.ParentTypePageID,
 								PageID: "some_id",
 							},
-							RichText: []notionapi.RichText{
+							RichText: []notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "content"},
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "content"},
 								},
 							},
 						},
 						{
-							Object:         notionapi.ObjectTypeComment,
+							Object:         notion.ObjectTypeComment,
 							ID:             "some_id",
 							DiscussionID:   "some_id",
 							CreatedTime:    timestamp,
 							LastEditedTime: timestamp,
 							CreatedBy:      user,
-							Parent: notionapi.Parent{
-								Type:   notionapi.ParentTypePageID,
+							Parent: notion.Parent{
+								Type:   notion.ParentTypePageID,
 								PageID: "some_id",
 							},
-							RichText: []notionapi.RichText{
+							RichText: []notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "content"},
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "content"},
 								},
 							},
 						},
@@ -87,7 +87,7 @@ func TestCommentClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Comment.Get(context.Background(), tt.id, nil)
 
 				if (err != nil) != tt.wantErr {
@@ -106,8 +106,8 @@ func TestCommentClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			request    *notionapi.CommentCreateRequest
-			want       *notionapi.Comment
+			request    *notion.CommentCreateRequest
+			want       *notion.Comment
 			wantErr    bool
 			err        error
 		}{
@@ -115,33 +115,33 @@ func TestCommentClient(t *testing.T) {
 				name:       "returns created comment",
 				filePath:   "testdata/comment_create.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.CommentCreateRequest{
-					Parent: notionapi.Parent{
-						Type:   notionapi.ParentTypePageID,
+				request: &notion.CommentCreateRequest{
+					Parent: notion.Parent{
+						Type:   notion.ParentTypePageID,
 						PageID: "some_id",
 					},
-					RichText: []notionapi.RichText{
+					RichText: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "Hello world"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "Hello world"},
 						},
 					},
 				},
-				want: &notionapi.Comment{
-					Object:         notionapi.ObjectTypeComment,
+				want: &notion.Comment{
+					Object:         notion.ObjectTypeComment,
 					ID:             "some_id",
 					DiscussionID:   "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
-					Parent: notionapi.Parent{
-						Type:   notionapi.ParentTypePageID,
+					Parent: notion.Parent{
+						Type:   notion.ParentTypePageID,
 						PageID: "some_id",
 					},
-					RichText: []notionapi.RichText{
+					RichText: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "Hello world"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "Hello world"},
 						},
 					},
 				},
@@ -151,7 +151,7 @@ func TestCommentClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.Comment.Create(context.Background(), tt.request)
 

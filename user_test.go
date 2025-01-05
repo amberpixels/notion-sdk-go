@@ -1,11 +1,12 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
-	"github.com/jomei/notionapi"
 	"net/http"
 	"reflect"
 	"testing"
+
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestUserClient(t *testing.T) {
@@ -14,8 +15,8 @@ func TestUserClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.UserID
-			want       *notionapi.User
+			id         notion.UserID
+			want       *notion.User
 			wantErr    bool
 			err        error
 		}{
@@ -24,13 +25,13 @@ func TestUserClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/user_get.json",
 				statusCode: http.StatusOK,
-				want: &notionapi.User{
-					Object:    notionapi.ObjectTypeUser,
+				want: &notion.User{
+					Object:    notion.ObjectTypeUser,
 					ID:        "some_id",
-					Type:      notionapi.UserTypePerson,
+					Type:      notion.UserTypePerson,
 					Name:      "John Doe",
 					AvatarURL: "some.url",
-					Person:    &notionapi.Person{Email: "some@email.com"},
+					Person:    &notion.Person{Email: "some@email.com"},
 				},
 			},
 		}
@@ -38,7 +39,7 @@ func TestUserClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.User.Get(context.Background(), tt.id)
 				if (err != nil) != tt.wantErr {
@@ -58,7 +59,7 @@ func TestUserClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			want       *notionapi.UsersListResponse
+			want       *notion.UsersListResponse
 			wantErr    bool
 			err        error
 		}{
@@ -66,23 +67,23 @@ func TestUserClient(t *testing.T) {
 				name:       "returns list of users",
 				filePath:   "testdata/user_list.json",
 				statusCode: http.StatusOK,
-				want: &notionapi.UsersListResponse{
-					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.User{
+				want: &notion.UsersListResponse{
+					Object: notion.ObjectTypeList,
+					Results: []notion.User{
 						{
-							Object:    notionapi.ObjectTypeUser,
+							Object:    notion.ObjectTypeUser,
 							ID:        "some_id",
-							Type:      notionapi.UserTypePerson,
+							Type:      notion.UserTypePerson,
 							Name:      "John Doe",
 							AvatarURL: "some.url",
-							Person:    &notionapi.Person{Email: "some@email.com"},
+							Person:    &notion.Person{Email: "some@email.com"},
 						},
 						{
-							Object: notionapi.ObjectTypeUser,
+							Object: notion.ObjectTypeUser,
 							ID:     "some_id",
-							Type:   notionapi.UserTypeBot,
+							Type:   notion.UserTypeBot,
 							Name:   "Test",
-							Bot:    &notionapi.Bot{},
+							Bot:    &notion.Bot{},
 						},
 					},
 					HasMore: false,
@@ -93,7 +94,7 @@ func TestUserClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.User.List(context.Background(), nil)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("List() error = %v, wantErr %v", err, tt.wantErr)
@@ -112,7 +113,7 @@ func TestUserClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			want       *notionapi.User
+			want       *notion.User
 			wantErr    bool
 			err        error
 		}{
@@ -120,13 +121,13 @@ func TestUserClient(t *testing.T) {
 				name:       "returns me-user",
 				filePath:   "testdata/user_me.json",
 				statusCode: http.StatusOK,
-				want: &notionapi.User{
-					Object:    notionapi.ObjectTypeUser,
+				want: &notion.User{
+					Object:    notion.ObjectTypeUser,
 					ID:        "some_id",
-					Type:      notionapi.UserTypePerson,
+					Type:      notion.UserTypePerson,
 					Name:      "John Doe",
 					AvatarURL: "some.url",
-					Bot: &notionapi.Bot{Owner: notionapi.Owner{
+					Bot: &notion.Bot{Owner: notion.Owner{
 						Type:      "workspace",
 						Workspace: true,
 					}, WorkspaceName: "John Doe's Workspace"},
@@ -137,7 +138,7 @@ func TestUserClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.User.Me(context.Background())
 				if (err != nil) != tt.wantErr {

@@ -1,4 +1,4 @@
-package ntast
+package notionast
 
 import (
 	"cmp"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	nt "github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 // NodeID is a unique identifier for a node
@@ -35,9 +35,9 @@ type Node interface {
 
 type Nodes []Node
 
-// NodeBlock is a node implementation for nt.Block
+// NodeBlock is a node implementation for notion.Block
 type NodeBlock struct {
-	block  nt.Block
+	block  notion.Block
 	nodeID NodeID // Same as the block ID (or generated if was empty)
 
 	firstChild *NodeBlock
@@ -53,13 +53,13 @@ var _ Node = (*NodeBlock)(nil)
 const RootNodeID = "tmp-0000000000"
 
 // NewNodeBlock returns a new NodeBlock with the given block
-func NewNodeBlock(block nt.Block, parent *NodeBlock) *NodeBlock {
+func NewNodeBlock(block notion.Block, parent *NodeBlock) *NodeBlock {
 	if block == nil && parent == nil {
 		// if no block and parent specified, it needs to create a fake root node
-		// nt.Block has no concept for this (a root for block, etc)
+		// notion.Block has no concept for this (a root for block, etc)
 		// so we just use ParagraphBlock for that
 		return &NodeBlock{
-			block:  nt.NewParagraphBlock(nt.Paragraph{}),
+			block:  notion.NewParagraphBlock(notion.Paragraph{}),
 			nodeID: RootNodeID,
 		}
 	}
@@ -82,7 +82,7 @@ func (n *NodeBlock) GetID() NodeID { return n.nodeID }
 func (n *NodeBlock) GetType() NodeType { return NodeType(n.block.GetType()) }
 
 // GetBlock returns the block of the node.
-func (n *NodeBlock) GetBlock() nt.Block { return n.block }
+func (n *NodeBlock) GetBlock() notion.Block { return n.block }
 
 // GetPrevSibling returns the previous sibling node, or nil if there is none.
 func (n *NodeBlock) GetPrevSibling() Node {
@@ -217,8 +217,8 @@ func (n *NodeBlock) RemoveChild(childNode Node) {
 	child.next = nil
 }
 
-// FromBlocks creates a new AST from the given nt.Blocks
-func FromBlocks(blocks nt.Blocks, parentArg ...*NodeBlock) Node {
+// FromBlocks creates a new AST from the given notion.Blocks
+func FromBlocks(blocks notion.Blocks, parentArg ...*NodeBlock) Node {
 	var parent *NodeBlock
 	if len(parentArg) > 0 && parentArg[0] != nil {
 		parent = parentArg[0]
@@ -234,7 +234,7 @@ func FromBlocks(blocks nt.Blocks, parentArg ...*NodeBlock) Node {
 
 		// Recursively process children if the block has them
 		if block.GetHasChildren() {
-			if deeper := FromBlocks(nt.GetChildren(block), node); deeper.GetChildCount() > 0 {
+			if deeper := FromBlocks(notion.GetChildren(block), node); deeper.GetChildCount() > 0 {
 				node.firstChild = deeper.GetFirstChild().(*NodeBlock)
 				node.lastChild = deeper.GetLastChild().(*NodeBlock)
 			}
@@ -258,9 +258,9 @@ func FromBlocks(blocks nt.Blocks, parentArg ...*NodeBlock) Node {
 	return parent
 }
 
-// ToBlocks converts the AST to nt.Blocks
-func ToBlocks(n *NodeBlock) nt.Blocks {
-	var blocks nt.Blocks
+// ToBlocks converts the AST to notion.Blocks
+func ToBlocks(n *NodeBlock) notion.Blocks {
+	var blocks notion.Blocks
 
 	// Helper function to recursively traverse the AST
 	var traverse func(node *NodeBlock)
@@ -280,7 +280,7 @@ func ToBlocks(n *NodeBlock) nt.Blocks {
 		// Add children blocks recursively
 		if child := node.GetFirstChild(); child != nil {
 			children := ToBlocks(child.(*NodeBlock))
-			nt.SetChildren(block, children) // Assuming nt.Block supports SetChildren()
+			notion.SetChildren(block, children) // Assuming notion.Block supports SetChildren()
 		}
 
 		// Process the next sibling

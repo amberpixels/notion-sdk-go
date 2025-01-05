@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestBlockClient(t *testing.T) {
@@ -22,7 +22,7 @@ func TestBlockClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.BlockID
+			id         notion.BlockID
 			len        int
 			wantErr    bool
 			err        error
@@ -39,7 +39,7 @@ func TestBlockClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Block.GetChildren(context.Background(), tt.id, nil)
 
 				if (err != nil) != tt.wantErr {
@@ -60,9 +60,9 @@ func TestBlockClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.BlockID
-			request    *notionapi.AppendBlockChildrenRequest
-			want       *notionapi.AppendBlockChildrenResponse
+			id         notion.BlockID
+			request    *notion.AppendBlockChildrenRequest
+			want       *notion.AppendBlockChildrenResponse
 			wantErr    bool
 			err        error
 		}{
@@ -71,54 +71,54 @@ func TestBlockClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/block_append_children.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.AppendBlockChildrenRequest{
-					Children: []notionapi.Block{
-						&notionapi.Heading2Block{
-							BasicBlock: notionapi.BasicBlock{
-								Object: notionapi.ObjectTypeBlock,
-								Type:   notionapi.BlockTypeHeading2,
+				request: &notion.AppendBlockChildrenRequest{
+					Children: []notion.Block{
+						&notion.Heading2Block{
+							BasicBlock: notion.BasicBlock{
+								Object: notion.ObjectTypeBlock,
+								Type:   notion.BlockTypeHeading2,
 							},
 							Heading2: struct {
-								RichText     []notionapi.RichText `json:"rich_text"`
-								Children     notionapi.Blocks     `json:"children,omitempty"`
-								Color        string               `json:"color,omitempty"`
-								IsToggleable bool                 `json:"is_toggleable,omitempty"`
-							}{[]notionapi.RichText{
+								RichText     []notion.RichText `json:"rich_text"`
+								Children     notion.Blocks     `json:"children,omitempty"`
+								Color        string            `json:"color,omitempty"`
+								IsToggleable bool              `json:"is_toggleable,omitempty"`
+							}{[]notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "Hello"},
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "Hello"},
 								},
 							}, nil, "", false,
 							},
 						},
 					},
 				},
-				want: &notionapi.AppendBlockChildrenResponse{
-					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.Block{&notionapi.ParagraphBlock{
-						BasicBlock: notionapi.BasicBlock{
-							Object:         notionapi.ObjectTypeBlock,
+				want: &notion.AppendBlockChildrenResponse{
+					Object: notion.ObjectTypeList,
+					Results: []notion.Block{&notion.ParagraphBlock{
+						BasicBlock: notion.BasicBlock{
+							Object:         notion.ObjectTypeBlock,
 							ID:             "some_id",
 							CreatedTime:    &timestamp,
 							LastEditedTime: &timestamp,
-							Type:           notionapi.BlockTypeParagraph,
-							CreatedBy: &notionapi.User{
+							Type:           notion.BlockTypeParagraph,
+							CreatedBy: &notion.User{
 								Object: "user",
 								ID:     "some_id",
 							},
-							LastEditedBy: &notionapi.User{
+							LastEditedBy: &notion.User{
 								Object: "user",
 								ID:     "some_id",
 							},
 						},
-						Paragraph: notionapi.Paragraph{
-							RichText: []notionapi.RichText{
+						Paragraph: notion.Paragraph{
+							RichText: []notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "AAAAAA"},
-									Annotations: &notionapi.Annotations{
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "AAAAAA"},
+									Annotations: &notion.Annotations{
 										Bold:  true,
-										Color: notionapi.ColorDefault,
+										Color: notion.ColorDefault,
 									},
 									PlainText: "AAAAAA",
 								},
@@ -133,7 +133,7 @@ func TestBlockClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Block.AppendChildren(context.Background(), tt.id, tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("AppendChildren() error = %v, wantErr %v", err, tt.wantErr)
@@ -162,8 +162,8 @@ func TestBlockClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.BlockID
-			want       notionapi.Block
+			id         notion.BlockID
+			want       notion.Block
 			wantErr    bool
 			err        error
 		}{
@@ -172,23 +172,23 @@ func TestBlockClient(t *testing.T) {
 				filePath:   "testdata/block_get.json",
 				statusCode: http.StatusOK,
 				id:         "some_id",
-				want: &notionapi.ChildPageBlock{
-					BasicBlock: notionapi.BasicBlock{
-						Object:         notionapi.ObjectTypeBlock,
+				want: &notion.ChildPageBlock{
+					BasicBlock: notion.BasicBlock{
+						Object:         notion.ObjectTypeBlock,
 						ID:             "some_id",
-						Type:           notionapi.BlockTypeChildPage,
+						Type:           notion.BlockTypeChildPage,
 						CreatedTime:    &timestamp,
 						LastEditedTime: &timestamp,
-						CreatedBy: &notionapi.User{
+						CreatedBy: &notion.User{
 							Object: "user",
 							ID:     "some_id",
 						},
-						LastEditedBy: &notionapi.User{
+						LastEditedBy: &notion.User{
 							Object: "user",
 							ID:     "some_id",
 						},
 						HasChildren: true,
-						Parent: &notionapi.Parent{
+						Parent: &notion.Parent{
 							Type:   "page_id",
 							PageID: "59833787-2cf9-4fdf-8782-e53db20768a5",
 						},
@@ -207,7 +207,7 @@ func TestBlockClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Block.Get(context.Background(), tt.id)
 
 				if (err != nil) != tt.wantErr {
@@ -226,9 +226,9 @@ func TestBlockClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.BlockID
-			req        *notionapi.BlockUpdateRequest
-			want       notionapi.Block
+			id         notion.BlockID
+			req        *notion.BlockUpdateRequest
+			want       notion.Block
 			wantErr    bool
 			err        error
 		}{
@@ -237,36 +237,36 @@ func TestBlockClient(t *testing.T) {
 				filePath:   "testdata/block_update.json",
 				statusCode: http.StatusOK,
 				id:         "some_id",
-				req: &notionapi.BlockUpdateRequest{
-					Paragraph: &notionapi.Paragraph{
-						RichText: []notionapi.RichText{
+				req: &notion.BlockUpdateRequest{
+					Paragraph: &notion.Paragraph{
+						RichText: []notion.RichText{
 							{
-								Text: &notionapi.Text{Content: "Hello"},
+								Text: &notion.Text{Content: "Hello"},
 							},
 						},
-						Color: notionapi.ColorYellow.String(),
+						Color: notion.ColorYellow.String(),
 					},
 				},
-				want: &notionapi.ParagraphBlock{
-					BasicBlock: notionapi.BasicBlock{
-						Object:         notionapi.ObjectTypeBlock,
+				want: &notion.ParagraphBlock{
+					BasicBlock: notion.BasicBlock{
+						Object:         notion.ObjectTypeBlock,
 						ID:             "some_id",
-						Type:           notionapi.BlockTypeParagraph,
+						Type:           notion.BlockTypeParagraph,
 						CreatedTime:    &timestamp,
 						LastEditedTime: &timestamp,
 					},
-					Paragraph: notionapi.Paragraph{
-						RichText: []notionapi.RichText{
+					Paragraph: notion.Paragraph{
+						RichText: []notion.RichText{
 							{
-								Type: notionapi.RichTextTypeText,
-								Text: &notionapi.Text{
+								Type: notion.RichTextTypeText,
+								Text: &notion.Text{
 									Content: "Hello",
 								},
-								Annotations: &notionapi.Annotations{Color: notionapi.ColorDefault},
+								Annotations: &notion.Annotations{Color: notion.ColorDefault},
 								PlainText:   "Hello",
 							},
 						},
-						Color: notionapi.ColorYellow.String(),
+						Color: notion.ColorYellow.String(),
 					},
 				},
 				wantErr: false,
@@ -277,7 +277,7 @@ func TestBlockClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Block.Update(context.Background(), tt.id, tt.req)
 
 				if (err != nil) != tt.wantErr {
@@ -298,8 +298,8 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var emoji notionapi.Emoji = "📌"
-	var user *notionapi.User = &notionapi.User{
+	var emoji notion.Emoji = "📌"
+	var user *notion.User = &notion.User{
 		Object: "user",
 		ID:     "some_id",
 	}
@@ -307,16 +307,16 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 		tests := []struct {
 			name     string
 			filePath string
-			want     notionapi.Blocks
+			want     notion.Blocks
 			wantErr  bool
 			err      error
 		}{
 			{
 				name:     "unmarshal",
 				filePath: "testdata/block_array_unmarshal.json",
-				want: notionapi.Blocks{
-					&notionapi.CalloutBlock{
-						BasicBlock: notionapi.BasicBlock{
+				want: notion.Blocks{
+					&notion.CalloutBlock{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block1",
 							Type:           "callout",
@@ -325,38 +325,38 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							CreatedBy:      user,
 							LastEditedBy:   user,
 						},
-						Callout: notionapi.Callout{
-							RichText: []notionapi.RichText{
+						Callout: notion.Callout{
+							RichText: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "This page is designed to be shared with students on the web. Click ",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Color: "default",
 									},
 									PlainText: "This page is designed to be shared with students on the web. Click ",
 								}, {
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "Share",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Code:  true,
 										Color: "default",
 									},
 									PlainText: "Share",
 								},
 							},
-							Icon: &notionapi.Icon{
+							Icon: &notion.Icon{
 								Type:  "emoji",
 								Emoji: &emoji,
 							},
-							Color: notionapi.ColorBlue.String(),
+							Color: notion.ColorBlue.String(),
 						},
 					},
-					&notionapi.Heading1Block{
-						BasicBlock: notionapi.BasicBlock{
+					&notion.Heading1Block{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block2",
 							Type:           "heading_1",
@@ -365,24 +365,24 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							CreatedBy:      user,
 							LastEditedBy:   user,
 						},
-						Heading1: notionapi.Heading{
-							RichText: []notionapi.RichText{
+						Heading1: notion.Heading{
+							RichText: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "History 340",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Color: "default",
 									},
 									PlainText: "History 340",
 								},
 							},
-							Color: notionapi.ColorBrownBackground.String(),
+							Color: notion.ColorBrownBackground.String(),
 						},
 					},
-					&notionapi.ChildDatabaseBlock{
-						BasicBlock: notionapi.BasicBlock{
+					&notion.ChildDatabaseBlock{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block3",
 							Type:           "child_database",
@@ -397,8 +397,8 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							Title: "Required Texts",
 						},
 					},
-					&notionapi.ColumnListBlock{
-						BasicBlock: notionapi.BasicBlock{
+					&notion.ColumnListBlock{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block4",
 							Type:           "column_list",
@@ -409,8 +409,8 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							HasChildren:    true,
 						},
 					},
-					&notionapi.Heading3Block{
-						BasicBlock: notionapi.BasicBlock{
+					&notion.Heading3Block{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block5",
 							Type:           "heading_3",
@@ -419,25 +419,25 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							CreatedBy:      user,
 							LastEditedBy:   user,
 						},
-						Heading3: notionapi.Heading{
-							RichText: []notionapi.RichText{
+						Heading3: notion.Heading{
+							RichText: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "Assignment Submission",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Bold:  true,
 										Color: "default",
 									},
 									PlainText: "Assignment Submission",
 								},
 							},
-							Color: notionapi.ColorDefault.String(),
+							Color: notion.ColorDefault.String(),
 						},
 					},
-					&notionapi.ParagraphBlock{
-						BasicBlock: notionapi.BasicBlock{
+					&notion.ParagraphBlock{
+						BasicBlock: notion.BasicBlock{
 							Object:         "block",
 							ID:             "block6",
 							Type:           "paragraph",
@@ -446,20 +446,20 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 							CreatedBy:      user,
 							LastEditedBy:   user,
 						},
-						Paragraph: notionapi.Paragraph{
-							RichText: []notionapi.RichText{
+						Paragraph: notion.Paragraph{
+							RichText: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "All essays and papers are due in lecture (due dates are listed on the schedule). No electronic copies will be accepted!",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Color: "default",
 									},
 									PlainText: "All essays and papers are due in lecture (due dates are listed on the schedule). No electronic copies will be accepted!",
 								},
 							},
-							Color: notionapi.ColorRed.String(),
+							Color: notion.ColorRed.String(),
 						},
 					},
 				},
@@ -472,7 +472,7 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				got := make(notionapi.Blocks, 0)
+				got := make(notion.Blocks, 0)
 				err = json.Unmarshal(data, &got)
 				if err != nil {
 					t.Fatal(err)
@@ -489,14 +489,14 @@ func TestBlockArrayUnmarshal(t *testing.T) {
 func TestBlockUpdateRequest_MarshallJSON(t *testing.T) {
 	tests := []struct {
 		name    string
-		req     *notionapi.BlockUpdateRequest
+		req     *notion.BlockUpdateRequest
 		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "update todo checkbox",
-			req: &notionapi.BlockUpdateRequest{
-				ToDo: &notionapi.ToDo{Checked: false, RichText: make([]notionapi.RichText, 0)},
+			req: &notion.BlockUpdateRequest{
+				ToDo: &notion.ToDo{Checked: false, RichText: make([]notion.RichText, 0)},
 			},
 			want: []byte(`{"to_do":{"rich_text":[],"checked":false}}`),
 		},

@@ -1,4 +1,4 @@
-package notionapi
+package notion
 
 type SortOrder string
 

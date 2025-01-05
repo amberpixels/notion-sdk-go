@@ -1,10 +1,11 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
-	"github.com/jomei/notionapi"
 	"net/http"
 	"testing"
+
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestSearchClient(t *testing.T) {
@@ -13,7 +14,7 @@ func TestSearchClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			request    *notionapi.SearchRequest
+			request    *notion.SearchRequest
 			wantErr    bool
 			err        error
 		}{
@@ -21,7 +22,7 @@ func TestSearchClient(t *testing.T) {
 				name:       "returns search result",
 				filePath:   "testdata/search.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.SearchRequest{
+				request: &notion.SearchRequest{
 					Query: "Hel",
 				},
 			},
@@ -30,7 +31,7 @@ func TestSearchClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.Search.Do(context.Background(), tt.request)
 

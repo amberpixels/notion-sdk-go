@@ -1,15 +1,17 @@
-package notionapi
+package notion_test
 
 import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestNumberPropertyConfig_MarshalJSON(t *testing.T) {
 	type fields struct {
-		Type   PropertyConfigType
-		Format FormatType
+		Type   notion.PropertyConfigType
+		Format notion.FormatType
 	}
 	tests := []struct {
 		name    string
@@ -20,8 +22,8 @@ func TestNumberPropertyConfig_MarshalJSON(t *testing.T) {
 		{
 			name: "returns correct json",
 			fields: fields{
-				Type:   PropertyConfigTypeNumber,
-				Format: FormatDollar,
+				Type:   notion.PropertyConfigTypeNumber,
+				Format: notion.FormatDollar,
 			},
 			want:    []byte(`{"type":"number","number":{"format":"dollar"}}`),
 			wantErr: false,
@@ -29,9 +31,9 @@ func TestNumberPropertyConfig_MarshalJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NumberPropertyConfig{
+			p := notion.NumberPropertyConfig{
 				Type:   tt.fields.Type,
-				Number: NumberFormat{Format: tt.fields.Format},
+				Number: notion.NumberFormat{Format: tt.fields.Format},
 			}
 			got, err := json.Marshal(p)
 			if (err != nil) != tt.wantErr {

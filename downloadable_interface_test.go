@@ -1,16 +1,18 @@
-package notionapi
+package notion_test
 
 import (
 	"testing"
 	"time"
+
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestPdfBlockImplementsDownloadableFileBlock(t *testing.T) {
 	// Test setup
 	now := time.Now()
-	pdfBlock := &PdfBlock{
-		Pdf: Pdf{
-			File: &FileObject{
+	pdfBlock := &notion.PdfBlock{
+		Pdf: notion.Pdf{
+			File: &notion.FileObject{
 				URL:        "https://example.com/file.pdf",
 				ExpiryTime: &now,
 			},
@@ -31,9 +33,9 @@ func TestPdfBlockImplementsDownloadableFileBlock(t *testing.T) {
 func TestFileBlockImplementsDownloadableFileBlock(t *testing.T) {
 	// Test setup
 	now := time.Now()
-	fileBlock := &FileBlock{
-		File: BlockFile{
-			File: &FileObject{
+	fileBlock := &notion.FileBlock{
+		File: notion.BlockFile{
+			File: &notion.FileObject{
 				URL:        "https://example.com/file.txt",
 				ExpiryTime: &now,
 			},
@@ -54,9 +56,9 @@ func TestFileBlockImplementsDownloadableFileBlock(t *testing.T) {
 func TestImageBlockImplementsDownloadableFileBlock(t *testing.T) {
 	// Test setup
 	now := time.Now()
-	imageBlock := &ImageBlock{
-		Image: Image{
-			File: &FileObject{
+	imageBlock := &notion.ImageBlock{
+		Image: notion.Image{
+			File: &notion.FileObject{
 				URL:        "https://example.com/image.jpg",
 				ExpiryTime: &now,
 			},
@@ -78,14 +80,14 @@ func TestExternalURLCases(t *testing.T) {
 	// Test External URLs for each block type
 	testCases := []struct {
 		name     string
-		block    DownloadableFileBlock
+		block    notion.DownloadableFileBlock
 		expected string
 	}{
 		{
 			name: "PDF with external URL",
-			block: &PdfBlock{
-				Pdf: Pdf{
-					External: &FileObject{
+			block: &notion.PdfBlock{
+				Pdf: notion.Pdf{
+					External: &notion.FileObject{
 						URL: "https://external.com/file.pdf",
 					},
 				},
@@ -94,9 +96,9 @@ func TestExternalURLCases(t *testing.T) {
 		},
 		{
 			name: "File with external URL",
-			block: &FileBlock{
-				File: BlockFile{
-					External: &FileObject{
+			block: &notion.FileBlock{
+				File: notion.BlockFile{
+					External: &notion.FileObject{
 						URL: "https://external.com/file.txt",
 					},
 				},
@@ -105,9 +107,9 @@ func TestExternalURLCases(t *testing.T) {
 		},
 		{
 			name: "Image with external URL",
-			block: &ImageBlock{
-				Image: Image{
-					External: &FileObject{
+			block: &notion.ImageBlock{
+				Image: notion.Image{
+					External: &notion.FileObject{
 						URL: "https://external.com/image.jpg",
 					},
 				},

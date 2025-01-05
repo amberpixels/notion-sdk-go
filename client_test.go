@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 // RoundTripFunc .
@@ -51,7 +51,7 @@ func TestRateLimit(t *testing.T) {
 				Header:     http.Header{"Retry-After": []string{"0"}},
 			}
 		})
-		client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c), notionapi.WithRetry(2))
+		client := notion.NewClient("some_token", notion.WithHTTPClient(c), notion.WithRetry(2))
 		_, err := client.Block.Get(context.Background(), "some_block_id")
 		if err == nil {
 			t.Errorf("Get() error = %v", err)
@@ -72,7 +72,7 @@ func TestRateLimit(t *testing.T) {
 				Header:     http.Header{"Retry-After": []string{"0"}},
 			}
 		})
-		client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c), notionapi.WithRetry(maxRetries))
+		client := notion.NewClient("some_token", notion.WithHTTPClient(c), notion.WithRetry(maxRetries))
 		_, err := client.Block.Get(context.Background(), "some_block_id")
 		if err == nil {
 			t.Errorf("Get() error = %v", err)
@@ -108,10 +108,10 @@ func TestBasicAuthHeader(t *testing.T) {
 		return resp
 	})
 
-	opts := []notionapi.ClientOption{
-		notionapi.WithHTTPClient(c),
-		notionapi.WithOAuthAppCredentials("my id here", "secret shhh"),
+	opts := []notion.ClientOption{
+		notion.WithHTTPClient(c),
+		notion.WithOAuthAppCredentials("my id here", "secret shhh"),
 	}
-	client := notionapi.NewClient("some_token", opts...)
-	_, _ = client.Authentication.CreateToken(context.Background(), &notionapi.TokenCreateRequest{})
+	client := notion.NewClient("some_token", opts...)
+	_, _ = client.Authentication.CreateToken(context.Background(), &notion.TokenCreateRequest{})
 }

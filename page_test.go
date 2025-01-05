@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestPageClient(t *testing.T) {
@@ -22,8 +22,8 @@ func TestPageClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.PageID
-			want       *notionapi.Page
+			id         notion.PageID
+			want       *notion.Page
 			wantErr    bool
 			err        error
 		}{
@@ -32,30 +32,30 @@ func TestPageClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/page_get.json",
 				statusCode: http.StatusOK,
-				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
+				want: &notion.Page{
+					Object:         notion.ObjectTypePage,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
+					CreatedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					LastEditedBy: notionapi.User{
+					LastEditedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
+					Parent: notion.Parent{
+						Type:       notion.ParentTypeDatabaseID,
 						DatabaseID: "some_id",
 					},
 					Archived: false,
 					URL:      "some_url",
-					Properties: notionapi.Properties{
-						"Tags": &notionapi.MultiSelectProperty{
+					Properties: notion.Properties{
+						"Tags": &notion.MultiSelectProperty{
 							ID:   ";s|V",
 							Type: "multi_select",
-							MultiSelect: []notionapi.Option{
+							MultiSelect: []notion.Option{
 								{
 									ID:    "some_id",
 									Name:  "tag",
@@ -63,78 +63,78 @@ func TestPageClient(t *testing.T) {
 								},
 							},
 						},
-						"Some another column": &notionapi.PeopleProperty{
+						"Some another column": &notion.PeopleProperty{
 							ID:   "rJt\\",
 							Type: "people",
-							People: []notionapi.User{
+							People: []notion.User{
 								{
 									Object:    "user",
 									ID:        "some_id",
 									Name:      "some name",
 									AvatarURL: "some.url",
 									Type:      "person",
-									Person: &notionapi.Person{
+									Person: &notion.Person{
 										Email: "some@email.com",
 									},
 								},
 							},
 						},
-						"SomeColumn": &notionapi.RichTextProperty{
+						"SomeColumn": &notion.RichTextProperty{
 							ID:   "~j_@",
 							Type: "rich_text",
-							RichText: []notionapi.RichText{
+							RichText: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "some text",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Color: "default",
 									},
 									PlainText: "some text",
 								},
 							},
 						},
-						"Some Files": &notionapi.FilesProperty{
+						"Some Files": &notion.FilesProperty{
 							ID:   "files",
 							Type: "files",
-							Files: []notionapi.File{
+							Files: []notion.File{
 								{
 									Name: "https://google.com",
 									Type: "external",
-									External: &notionapi.FileObject{
+									External: &notion.FileObject{
 										URL: "https://google.com",
 									},
 								},
 							},
 						},
-						"Name": &notionapi.TitleProperty{
+						"Name": &notion.TitleProperty{
 							ID:   "title",
 							Type: "title",
-							Title: []notionapi.RichText{
+							Title: []notion.RichText{
 								{
 									Type: "text",
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "Hello",
 									},
-									Annotations: &notionapi.Annotations{
+									Annotations: &notion.Annotations{
 										Color: "default",
 									},
 									PlainText: "Hello",
 								},
 							},
 						},
-						"RollupArray": &notionapi.RollupProperty{
+						"RollupArray": &notion.RollupProperty{
 							ID:   "abcd",
 							Type: "rollup",
-							Rollup: notionapi.Rollup{
+							Rollup: notion.Rollup{
 								Type: "array",
-								Array: notionapi.PropertyArray{
-									&notionapi.NumberProperty{
+								Array: notion.PropertyArray{
+									&notion.NumberProperty{
 										Type:   "number",
 										Number: 42.2,
 									},
-									&notionapi.NumberProperty{
+									&notion.NumberProperty{
 										Type:   "number",
 										Number: 56,
 									},
@@ -150,8 +150,8 @@ func TestPageClient(t *testing.T) {
 				filePath:   "testdata/validation_error.json",
 				statusCode: http.StatusBadRequest,
 				wantErr:    true,
-				err: &notionapi.Error{
-					Object:  notionapi.ObjectTypeError,
+				err: &notion.Error{
+					Object:  notion.ObjectTypeError,
 					Status:  http.StatusBadRequest,
 					Code:    "validation_error",
 					Message: "The provided page ID is not a valid Notion UUID: bla bla.",
@@ -162,7 +162,7 @@ func TestPageClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.Page.Get(context.Background(), tt.id)
 				if err != nil {
@@ -189,9 +189,9 @@ func TestPageClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.PageID
-			request    *notionapi.PageCreateRequest
-			want       *notionapi.Page
+			id         notion.PageID
+			request    *notion.PageCreateRequest
+			want       *notion.Page
 			wantErr    bool
 			err        error
 		}{
@@ -199,34 +199,34 @@ func TestPageClient(t *testing.T) {
 				name:       "returns a new page",
 				filePath:   "testdata/page_create.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.PageCreateRequest{
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
+				request: &notion.PageCreateRequest{
+					Parent: notion.Parent{
+						Type:       notion.ParentTypeDatabaseID,
 						DatabaseID: "f830be5eff534859932e5b81542b3c7b",
 					},
-					Properties: notionapi.Properties{
-						"Name": notionapi.TitleProperty{
-							Title: []notionapi.RichText{
-								{Text: &notionapi.Text{Content: "hello"}},
+					Properties: notion.Properties{
+						"Name": notion.TitleProperty{
+							Title: []notion.RichText{
+								{Text: &notion.Text{Content: "hello"}},
 							},
 						},
 					},
 				},
-				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
+				want: &notion.Page{
+					Object:         notion.ObjectTypePage,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
+					CreatedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					LastEditedBy: notionapi.User{
+					LastEditedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
+					Parent: notion.Parent{
+						Type:       notion.ParentTypeDatabaseID,
 						DatabaseID: "some_id",
 					},
 					Archived: false,
@@ -238,7 +238,7 @@ func TestPageClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Page.Create(context.Background(), tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
@@ -258,9 +258,9 @@ func TestPageClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.PageID
-			request    *notionapi.PageUpdateRequest
-			want       *notionapi.Page
+			id         notion.PageID
+			request    *notion.PageUpdateRequest
+			want       *notion.Page
 			wantErr    bool
 			err        error
 		}{
@@ -269,31 +269,31 @@ func TestPageClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/page_update.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.PageUpdateRequest{
-					Properties: notionapi.Properties{
-						"SomeColumn": notionapi.RichTextProperty{
-							Type: notionapi.PropertyTypeRichText,
-							RichText: []notionapi.RichText{
+				request: &notion.PageUpdateRequest{
+					Properties: notion.Properties{
+						"SomeColumn": notion.RichTextProperty{
+							Type: notion.PropertyTypeRichText,
+							RichText: []notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "patch"},
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "patch"},
 								},
 							},
 						},
-						"Important Files": notionapi.FilesProperty{
+						"Important Files": notion.FilesProperty{
 							Type: "files",
-							Files: []notionapi.File{
+							Files: []notion.File{
 								{
 									Type: "external",
 									Name: "https://google.com",
-									External: &notionapi.FileObject{
+									External: &notion.FileObject{
 										URL: "https://google.com",
 									},
 								},
 								{
 									Type: "external",
 									Name: "https://123.com",
-									External: &notionapi.FileObject{
+									External: &notion.FileObject{
 										URL: "https://123.com",
 									},
 								},
@@ -301,21 +301,21 @@ func TestPageClient(t *testing.T) {
 						},
 					},
 				},
-				want: &notionapi.Page{
-					Object:         notionapi.ObjectTypePage,
+				want: &notion.Page{
+					Object:         notion.ObjectTypePage,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
-					CreatedBy: notionapi.User{
+					CreatedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					LastEditedBy: notionapi.User{
+					LastEditedBy: notion.User{
 						Object: "user",
 						ID:     "some_id",
 					},
-					Parent: notionapi.Parent{
-						Type:       notionapi.ParentTypeDatabaseID,
+					Parent: notion.Parent{
+						Type:       notion.ParentTypeDatabaseID,
 						DatabaseID: "some_id",
 					},
 					Archived: false,
@@ -326,7 +326,7 @@ func TestPageClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Page.Update(context.Background(), tt.id, tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
@@ -349,56 +349,56 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 		return
 	}
 
-	dateObj := notionapi.Date(timeObj)
+	dateObj := notion.Date(timeObj)
 	tests := []struct {
 		name    string
-		req     *notionapi.PageCreateRequest
+		req     *notion.PageCreateRequest
 		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "create a page",
-			req: &notionapi.PageCreateRequest{
-				Parent: notionapi.Parent{
+			req: &notion.PageCreateRequest{
+				Parent: notion.Parent{
 					DatabaseID: "some_id",
 				},
-				Properties: notionapi.Properties{
-					"Type": notionapi.SelectProperty{
-						Select: notionapi.Option{
+				Properties: notion.Properties{
+					"Type": notion.SelectProperty{
+						Select: notion.Option{
 							ID:    "some_id",
 							Name:  "Article",
-							Color: notionapi.ColorDefault,
+							Color: notion.ColorDefault,
 						},
 					},
-					"Name": notionapi.TitleProperty{
-						Title: []notionapi.RichText{
-							{Text: &notionapi.Text{Content: "New Media Article"}},
+					"Name": notion.TitleProperty{
+						Title: []notion.RichText{
+							{Text: &notion.Text{Content: "New Media Article"}},
 						},
 					},
-					"Publishing/Release Date": notionapi.DateProperty{
-						Date: &notionapi.DateObject{
+					"Publishing/Release Date": notion.DateProperty{
+						Date: &notion.DateObject{
 							Start: &dateObj,
 						},
 					},
-					"Link": notionapi.URLProperty{
+					"Link": notion.URLProperty{
 						URL: "some_url",
 					},
-					"Summary": notionapi.TextProperty{
-						Text: []notionapi.RichText{
+					"Summary": notion.TextProperty{
+						Text: []notion.RichText{
 							{
-								Type: notionapi.RichTextTypeText,
-								Text: &notionapi.Text{
+								Type: notion.RichTextTypeText,
+								Text: &notion.Text{
 									Content: "Some content",
 								},
-								Annotations: &notionapi.Annotations{
+								Annotations: &notion.Annotations{
 									Bold:  true,
-									Color: notionapi.ColorBlue,
+									Color: notion.ColorBlue,
 								},
 								PlainText: "Some content",
 							},
 						},
 					},
-					"Read": notionapi.CheckboxProperty{
+					"Read": notion.CheckboxProperty{
 						Checkbox: false,
 					},
 				},
@@ -407,76 +407,76 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 		},
 		{
 			name: "create a page with content",
-			req: &notionapi.PageCreateRequest{
-				Parent: notionapi.Parent{
+			req: &notion.PageCreateRequest{
+				Parent: notion.Parent{
 					DatabaseID: "some_id",
 				},
-				Properties: notionapi.Properties{
-					"Type": notionapi.SelectProperty{
-						Select: notionapi.Option{
+				Properties: notion.Properties{
+					"Type": notion.SelectProperty{
+						Select: notion.Option{
 							ID:    "some_id",
 							Name:  "Article",
-							Color: notionapi.ColorDefault,
+							Color: notion.ColorDefault,
 						},
 					},
-					"Name": notionapi.TitleProperty{
-						Title: []notionapi.RichText{
-							{Text: &notionapi.Text{Content: "New Media Article"}},
+					"Name": notion.TitleProperty{
+						Title: []notion.RichText{
+							{Text: &notion.Text{Content: "New Media Article"}},
 						},
 					},
-					"Publishing/Release Date": notionapi.DateProperty{
-						Date: &notionapi.DateObject{
+					"Publishing/Release Date": notion.DateProperty{
+						Date: &notion.DateObject{
 							Start: &dateObj,
 						},
 					},
-					"Link": notionapi.URLProperty{
+					"Link": notion.URLProperty{
 						URL: "some_url",
 					},
-					"Summary": notionapi.TextProperty{
-						Text: []notionapi.RichText{
+					"Summary": notion.TextProperty{
+						Text: []notion.RichText{
 							{
-								Type: notionapi.RichTextTypeText,
-								Text: &notionapi.Text{
+								Type: notion.RichTextTypeText,
+								Text: &notion.Text{
 									Content: "Some content",
 								},
-								Annotations: &notionapi.Annotations{
+								Annotations: &notion.Annotations{
 									Bold:  true,
-									Color: notionapi.ColorBlue,
+									Color: notion.ColorBlue,
 								},
 								PlainText: "Some content",
 							},
 						},
 					},
-					"Read": notionapi.CheckboxProperty{
+					"Read": notion.CheckboxProperty{
 						Checkbox: false,
 					},
 				},
-				Children: []notionapi.Block{
-					&notionapi.Heading2Block{
-						BasicBlock: notionapi.BasicBlock{
-							Object: notionapi.ObjectTypeBlock,
-							Type:   notionapi.BlockTypeHeading2,
+				Children: []notion.Block{
+					&notion.Heading2Block{
+						BasicBlock: notion.BasicBlock{
+							Object: notion.ObjectTypeBlock,
+							Type:   notion.BlockTypeHeading2,
 						},
-						Heading2: notionapi.Heading{
-							RichText: []notionapi.RichText{
+						Heading2: notion.Heading{
+							RichText: []notion.RichText{
 								{
-									Type: notionapi.RichTextTypeText,
-									Text: &notionapi.Text{Content: "Lacinato"},
+									Type: notion.RichTextTypeText,
+									Text: &notion.Text{Content: "Lacinato"},
 								},
 							},
 						},
 					},
-					&notionapi.ParagraphBlock{
-						BasicBlock: notionapi.BasicBlock{
-							Object: notionapi.ObjectTypeBlock,
-							Type:   notionapi.BlockTypeParagraph,
+					&notion.ParagraphBlock{
+						BasicBlock: notion.BasicBlock{
+							Object: notion.ObjectTypeBlock,
+							Type:   notion.BlockTypeParagraph,
 						},
-						Paragraph: notionapi.Paragraph{
-							RichText: []notionapi.RichText{
+						Paragraph: notion.Paragraph{
+							RichText: []notion.RichText{
 								{
-									Text: &notionapi.Text{
+									Text: &notion.Text{
 										Content: "Lacinato",
-										Link: &notionapi.Link{
+										Link: &notion.Link{
 											Url: "some_url",
 										},
 									},
@@ -508,15 +508,15 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 func TestPageUpdateRequest_MarshallJSON(t *testing.T) {
 	tests := []struct {
 		name    string
-		req     *notionapi.PageUpdateRequest
+		req     *notion.PageUpdateRequest
 		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "update checkbox",
-			req: &notionapi.PageUpdateRequest{
-				Properties: map[string]notionapi.Property{
-					"Checked": notionapi.CheckboxProperty{
+			req: &notion.PageUpdateRequest{
+				Properties: map[string]notion.Property{
+					"Checked": notion.CheckboxProperty{
 						Checkbox: false,
 					},
 				},

@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestAuthenticationClient(t *testing.T) {
@@ -15,20 +15,20 @@ func TestAuthenticationClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			request    *notionapi.TokenCreateRequest
-			want       *notionapi.TokenCreateResponse
+			request    *notion.TokenCreateRequest
+			want       *notion.TokenCreateResponse
 			wantErr    error
 		}{
 			{
 				name:       "Creates token",
 				filePath:   "testdata/create_token.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.TokenCreateRequest{
+				request: &notion.TokenCreateRequest{
 					Code:        "code1",
 					GrantType:   "authorization_code",
 					RedirectUri: "www.example.com",
 				},
-				want: &notionapi.TokenCreateResponse{
+				want: &notion.TokenCreateResponse{
 					AccessToken:          "token1",
 					BotId:                "bot1",
 					DuplicatedTemplateId: "template_id1",
@@ -42,12 +42,12 @@ func TestAuthenticationClient(t *testing.T) {
 				name:       "Creates token",
 				filePath:   "testdata/create_token_error.json",
 				statusCode: http.StatusBadRequest,
-				request: &notionapi.TokenCreateRequest{
+				request: &notion.TokenCreateRequest{
 					Code:        "code1",
 					GrantType:   "authorization_code",
 					RedirectUri: "www.example.com",
 				},
-				wantErr: &notionapi.TokenCreateError{
+				wantErr: &notion.TokenCreateError{
 					Code:    "invalid_grant",
 					Message: "Invalid code.",
 				},
@@ -57,7 +57,7 @@ func TestAuthenticationClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, gotErr := client.Authentication.CreateToken(context.Background(), tt.request)
 
 				if !reflect.DeepEqual(gotErr, tt.wantErr) {

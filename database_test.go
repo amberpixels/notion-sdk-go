@@ -1,4 +1,4 @@
-package notionapi_test
+package notion_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestDatabaseClient(t *testing.T) {
@@ -16,9 +16,9 @@ func TestDatabaseClient(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	emoji := notionapi.Emoji("🎉")
+	emoji := notion.Emoji("🎉")
 
-	var user = notionapi.User{
+	var user = notion.User{
 		Object: "user",
 		ID:     "some_id",
 	}
@@ -28,8 +28,8 @@ func TestDatabaseClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.DatabaseID
-			want       *notionapi.Database
+			id         notion.DatabaseID
+			want       *notion.Database
 			wantErr    bool
 			err        error
 		}{
@@ -38,37 +38,37 @@ func TestDatabaseClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/database_get.json",
 				statusCode: http.StatusOK,
-				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
+				want: &notion.Database{
+					Object:         notion.ObjectTypeDatabase,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
 					LastEditedBy:   user,
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type:        notionapi.RichTextTypeText,
-							Text:        &notionapi.Text{Content: "Test Database"},
-							Annotations: &notionapi.Annotations{Color: "default"},
+							Type:        notion.RichTextTypeText,
+							Text:        &notion.Text{Content: "Test Database"},
+							Annotations: &notion.Annotations{Color: "default"},
 							PlainText:   "Test Database",
 							Href:        "",
 						},
 					},
-					//Properties: notionapi.PropertyConfigs{
-					//	"Tags": notionapi.MultiSelectPropertyConfig{
+					//Properties: notion.PropertyConfigs{
+					//	"Tags": notion.MultiSelectPropertyConfig{
 					//		ID:          ";s|V",
-					//		Type:        notionapi.PropertyConfigTypeMultiSelect,
-					//		MultiSelect: notionapi.Select{Options: []notionapi.Option{{ID: "id", Name: "tag", Color: "Blue"}}},
+					//		Type:        notion.PropertyConfigTypeMultiSelect,
+					//		MultiSelect: notion.Select{Options: []notion.Option{{ID: "id", Name: "tag", Color: "Blue"}}},
 					//	},
-					//	"Some another column": notionapi.PeoplePropertyConfig{
+					//	"Some another column": notion.PeoplePropertyConfig{
 					//		ID:   "rJt\\",
-					//		Type: notionapi.PropertyConfigTypePeople,
+					//		Type: notion.PropertyConfigTypePeople,
 					//	},
 					//
-					//	"Name": notionapi.TitlePropertyConfig{
+					//	"Name": notion.TitlePropertyConfig{
 					//		ID:    "title",
-					//		Type:  notionapi.PropertyConfigTypeTitle,
-					//		Title: notionapi.RichText{},
+					//		Type:  notion.PropertyConfigTypeTitle,
+					//		Title: notion.RichText{},
 					//	},
 					//},
 				},
@@ -78,7 +78,7 @@ func TestDatabaseClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Database.Get(context.Background(), tt.id)
 
 				if (err != nil) != tt.wantErr {
@@ -99,9 +99,9 @@ func TestDatabaseClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.DatabaseID
-			request    *notionapi.DatabaseQueryRequest
-			want       *notionapi.DatabaseQueryResponse
+			id         notion.DatabaseID
+			request    *notion.DatabaseQueryRequest
+			want       *notion.DatabaseQueryResponse
 			wantErr    bool
 			err        error
 		}{
@@ -110,26 +110,26 @@ func TestDatabaseClient(t *testing.T) {
 				id:         "some_id",
 				filePath:   "testdata/database_query.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.DatabaseQueryRequest{
-					Filter: &notionapi.PropertyFilter{
+				request: &notion.DatabaseQueryRequest{
+					Filter: &notion.PropertyFilter{
 						Property: "Name",
-						RichText: &notionapi.TextFilterCondition{
+						RichText: &notion.TextFilterCondition{
 							Contains: "Hel",
 						},
 					},
 				},
-				want: &notionapi.DatabaseQueryResponse{
-					Object: notionapi.ObjectTypeList,
-					Results: []notionapi.Page{
+				want: &notion.DatabaseQueryResponse{
+					Object: notion.ObjectTypeList,
+					Results: []notion.Page{
 						{
-							Object:         notionapi.ObjectTypePage,
+							Object:         notion.ObjectTypePage,
 							ID:             "some_id",
 							CreatedTime:    timestamp,
 							LastEditedTime: timestamp,
 							CreatedBy:      user,
 							LastEditedBy:   user,
-							Parent: notionapi.Parent{
-								Type:       notionapi.ParentTypeDatabaseID,
+							Parent: notion.Parent{
+								Type:       notion.ParentTypeDatabaseID,
 								DatabaseID: "some_id",
 							},
 							Archived: false,
@@ -145,7 +145,7 @@ func TestDatabaseClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Database.Query(context.Background(), tt.id, tt.request)
 
 				if (err != nil) != tt.wantErr {
@@ -165,9 +165,9 @@ func TestDatabaseClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			id         notionapi.DatabaseID
-			request    *notionapi.DatabaseUpdateRequest
-			want       *notionapi.Database
+			id         notion.DatabaseID
+			request    *notion.DatabaseUpdateRequest
+			want       *notion.Database
 			wantErr    bool
 			err        error
 		}{
@@ -176,46 +176,46 @@ func TestDatabaseClient(t *testing.T) {
 				filePath:   "testdata/database_update.json",
 				statusCode: http.StatusOK,
 				id:         "some_id",
-				request: &notionapi.DatabaseUpdateRequest{
-					Title: []notionapi.RichText{
+				request: &notion.DatabaseUpdateRequest{
+					Title: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "patch"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "patch"},
 						},
 					},
-					Properties: notionapi.PropertyConfigs{
-						"patch": notionapi.TitlePropertyConfig{
-							Type: notionapi.PropertyConfigTypeRichText,
+					Properties: notion.PropertyConfigs{
+						"patch": notion.TitlePropertyConfig{
+							Type: notion.PropertyConfigTypeRichText,
 						},
 					},
 				},
-				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
+				want: &notion.Database{
+					Object:         notion.ObjectTypeDatabase,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
 					LastEditedBy:   user,
-					Parent: notionapi.Parent{
+					Parent: notion.Parent{
 						Type:   "page_id",
 						PageID: "48f8fee9-cd79-4180-bc2f-ec0398253067",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "patch"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "patch"},
 						},
 					},
-					Description: []notionapi.RichText{},
+					Description: []notion.RichText{},
 					IsInline:    false,
 					Archived:    false,
-					Icon: &notionapi.Icon{
+					Icon: &notion.Icon{
 						Type:  "emoji",
 						Emoji: &emoji,
 					},
-					Cover: &notionapi.Image{
+					Cover: &notion.Image{
 						Type: "external",
-						External: &notionapi.FileObject{
+						External: &notion.FileObject{
 							URL: "https://website.domain/images/image.png",
 						},
 					},
@@ -226,7 +226,7 @@ func TestDatabaseClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 				got, err := client.Database.Update(context.Background(), tt.id, tt.request)
 
 				if (err != nil) != tt.wantErr {
@@ -246,8 +246,8 @@ func TestDatabaseClient(t *testing.T) {
 			name       string
 			filePath   string
 			statusCode int
-			request    *notionapi.DatabaseCreateRequest
-			want       *notionapi.Database
+			request    *notion.DatabaseCreateRequest
+			want       *notion.Database
 			wantErr    bool
 			err        error
 		}{
@@ -255,53 +255,53 @@ func TestDatabaseClient(t *testing.T) {
 				name:       "returns created db",
 				filePath:   "testdata/database_create.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.DatabaseCreateRequest{
-					Parent: notionapi.Parent{
-						Type:   notionapi.ParentTypePageID,
+				request: &notion.DatabaseCreateRequest{
+					Parent: notion.Parent{
+						Type:   notion.ParentTypePageID,
 						PageID: "some_id",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "Grocery List"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "Grocery List"},
 						},
 					},
-					Properties: notionapi.PropertyConfigs{
-						"create": notionapi.TitlePropertyConfig{
-							Type: notionapi.PropertyConfigTypeTitle,
+					Properties: notion.PropertyConfigs{
+						"create": notion.TitlePropertyConfig{
+							Type: notion.PropertyConfigTypeTitle,
 						},
 					},
 					IsInline: false,
 				},
-				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
+				want: &notion.Database{
+					Object:         notion.ObjectTypeDatabase,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
 					LastEditedBy:   user,
-					Parent: notionapi.Parent{
+					Parent: notion.Parent{
 						Type:   "page_id",
 						PageID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type:        notionapi.RichTextTypeText,
-							Text:        &notionapi.Text{Content: "Grocery List"},
+							Type:        notion.RichTextTypeText,
+							Text:        &notion.Text{Content: "Grocery List"},
 							PlainText:   "Grocery List",
-							Annotations: &notionapi.Annotations{Color: notionapi.ColorDefault},
+							Annotations: &notion.Annotations{Color: notion.ColorDefault},
 						},
 					},
-					Description: []notionapi.RichText{},
+					Description: []notion.RichText{},
 					IsInline:    false,
 					Archived:    false,
-					Icon: &notionapi.Icon{
+					Icon: &notion.Icon{
 						Type:  "emoji",
 						Emoji: &emoji,
 					},
-					Cover: &notionapi.Image{
+					Cover: &notion.Image{
 						Type: "external",
-						External: &notionapi.FileObject{
+						External: &notion.FileObject{
 							URL: "https://website.domain/images/image.png",
 						},
 					},
@@ -311,53 +311,53 @@ func TestDatabaseClient(t *testing.T) {
 				name:       "returns created db 2",
 				filePath:   "testdata/database_create_2.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.DatabaseCreateRequest{
-					Parent: notionapi.Parent{
-						Type:   notionapi.ParentTypePageID,
+				request: &notion.DatabaseCreateRequest{
+					Parent: notion.Parent{
+						Type:   notion.ParentTypePageID,
 						PageID: "some_id",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "Grocery List"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "Grocery List"},
 						},
 					},
-					Properties: notionapi.PropertyConfigs{
-						"create": notionapi.TitlePropertyConfig{
-							Type: notionapi.PropertyConfigTypeTitle,
+					Properties: notion.PropertyConfigs{
+						"create": notion.TitlePropertyConfig{
+							Type: notion.PropertyConfigTypeTitle,
 						},
 					},
 					IsInline: false,
 				},
-				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
+				want: &notion.Database{
+					Object:         notion.ObjectTypeDatabase,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
 					LastEditedBy:   user,
-					Parent: notionapi.Parent{
+					Parent: notion.Parent{
 						Type:    "block_id",
 						BlockID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type:        notionapi.RichTextTypeText,
-							Text:        &notionapi.Text{Content: "Grocery List"},
+							Type:        notion.RichTextTypeText,
+							Text:        &notion.Text{Content: "Grocery List"},
 							PlainText:   "Grocery List",
-							Annotations: &notionapi.Annotations{Color: notionapi.ColorDefault},
+							Annotations: &notion.Annotations{Color: notion.ColorDefault},
 						},
 					},
-					Description: []notionapi.RichText{},
+					Description: []notion.RichText{},
 					IsInline:    false,
 					Archived:    false,
-					Icon: &notionapi.Icon{
+					Icon: &notion.Icon{
 						Type:  "emoji",
 						Emoji: &emoji,
 					},
-					Cover: &notionapi.Image{
+					Cover: &notion.Image{
 						Type: "external",
-						External: &notionapi.FileObject{
+						External: &notion.FileObject{
 							URL: "https://website.domain/images/image.png",
 						},
 					},
@@ -367,53 +367,53 @@ func TestDatabaseClient(t *testing.T) {
 				name:       "returns created db 3",
 				filePath:   "testdata/database_create_3.json",
 				statusCode: http.StatusOK,
-				request: &notionapi.DatabaseCreateRequest{
-					Parent: notionapi.Parent{
-						Type:   notionapi.ParentTypePageID,
+				request: &notion.DatabaseCreateRequest{
+					Parent: notion.Parent{
+						Type:   notion.ParentTypePageID,
 						PageID: "some_id",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type: notionapi.RichTextTypeText,
-							Text: &notionapi.Text{Content: "Grocery List"},
+							Type: notion.RichTextTypeText,
+							Text: &notion.Text{Content: "Grocery List"},
 						},
 					},
-					Properties: notionapi.PropertyConfigs{
-						"create": notionapi.TitlePropertyConfig{
-							Type: notionapi.PropertyConfigTypeTitle,
+					Properties: notion.PropertyConfigs{
+						"create": notion.TitlePropertyConfig{
+							Type: notion.PropertyConfigTypeTitle,
 						},
 					},
 					IsInline: true,
 				},
-				want: &notionapi.Database{
-					Object:         notionapi.ObjectTypeDatabase,
+				want: &notion.Database{
+					Object:         notion.ObjectTypeDatabase,
 					ID:             "some_id",
 					CreatedTime:    timestamp,
 					LastEditedTime: timestamp,
 					CreatedBy:      user,
 					LastEditedBy:   user,
-					Parent: notionapi.Parent{
+					Parent: notion.Parent{
 						Type:   "page_id",
 						PageID: "a7744006-9233-4cd0-bf44-3a49de2c01b5",
 					},
-					Title: []notionapi.RichText{
+					Title: []notion.RichText{
 						{
-							Type:        notionapi.RichTextTypeText,
-							Text:        &notionapi.Text{Content: "Grocery List"},
+							Type:        notion.RichTextTypeText,
+							Text:        &notion.Text{Content: "Grocery List"},
 							PlainText:   "Grocery List",
-							Annotations: &notionapi.Annotations{Color: notionapi.ColorDefault},
+							Annotations: &notion.Annotations{Color: notion.ColorDefault},
 						},
 					},
-					Description: []notionapi.RichText{},
+					Description: []notion.RichText{},
 					IsInline:    true,
 					Archived:    false,
-					Icon: &notionapi.Icon{
+					Icon: &notion.Icon{
 						Type:  "emoji",
 						Emoji: &emoji,
 					},
-					Cover: &notionapi.Image{
+					Cover: &notion.Image{
 						Type: "external",
-						External: &notionapi.FileObject{
+						External: &notion.FileObject{
 							URL: "https://website.domain/images/image.png",
 						},
 					},
@@ -424,7 +424,7 @@ func TestDatabaseClient(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notionapi.NewClient("some_token", notionapi.WithHTTPClient(c))
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
 
 				got, err := client.Database.Create(context.Background(), tt.request)
 
@@ -441,8 +441,8 @@ func TestDatabaseClient(t *testing.T) {
 	})
 
 	t.Run("Get with empty database_id", func(t *testing.T) {
-		client := notionapi.NewClient("some_token")
-		_, err := client.Database.Get(context.TODO(), notionapi.DatabaseID(""))
+		client := notion.NewClient("some_token")
+		_, err := client.Database.Get(context.TODO(), notion.DatabaseID(""))
 		if err.Error() != "empty database id" {
 			t.Error("database id is required error is expected")
 		}
@@ -455,19 +455,19 @@ func TestDatabaseQueryRequest_MarshalJSON(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	dateObj := notionapi.Date(timeObj)
+	dateObj := notion.Date(timeObj)
 	tests := []struct {
 		name    string
-		req     *notionapi.DatabaseQueryRequest
+		req     *notion.DatabaseQueryRequest
 		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "timestamp created",
-			req: &notionapi.DatabaseQueryRequest{
-				Filter: &notionapi.TimestampFilter{
-					Timestamp: notionapi.TimestampCreated,
-					CreatedTime: &notionapi.DateFilterCondition{
+			req: &notion.DatabaseQueryRequest{
+				Filter: &notion.TimestampFilter{
+					Timestamp: notion.TimestampCreated,
+					CreatedTime: &notion.DateFilterCondition{
 						NextWeek: &struct{}{},
 					},
 				},
@@ -476,10 +476,10 @@ func TestDatabaseQueryRequest_MarshalJSON(t *testing.T) {
 		},
 		{
 			name: "timestamp last edited",
-			req: &notionapi.DatabaseQueryRequest{
-				Filter: &notionapi.TimestampFilter{
-					Timestamp: notionapi.TimestampLastEdited,
-					LastEditedTime: &notionapi.DateFilterCondition{
+			req: &notion.DatabaseQueryRequest{
+				Filter: &notion.TimestampFilter{
+					Timestamp: notion.TimestampLastEdited,
+					LastEditedTime: &notion.DateFilterCondition{
 						Before: &dateObj,
 					},
 				},
@@ -488,17 +488,17 @@ func TestDatabaseQueryRequest_MarshalJSON(t *testing.T) {
 		},
 		{
 			name: "or compound filter one level",
-			req: &notionapi.DatabaseQueryRequest{
-				Filter: notionapi.OrCompoundFilter{
-					notionapi.PropertyFilter{
+			req: &notion.DatabaseQueryRequest{
+				Filter: notion.OrCompoundFilter{
+					notion.PropertyFilter{
 						Property: "Status",
-						Select: &notionapi.SelectFilterCondition{
+						Select: &notion.SelectFilterCondition{
 							Equals: "Reading",
 						},
 					},
-					notionapi.PropertyFilter{
+					notion.PropertyFilter{
 						Property: "Publisher",
-						Select: &notionapi.SelectFilterCondition{
+						Select: &notion.SelectFilterCondition{
 							Equals: "NYT",
 						},
 					},
@@ -508,17 +508,17 @@ func TestDatabaseQueryRequest_MarshalJSON(t *testing.T) {
 		},
 		{
 			name: "and compound filter one level",
-			req: &notionapi.DatabaseQueryRequest{
-				Filter: notionapi.AndCompoundFilter{
-					notionapi.PropertyFilter{
+			req: &notion.DatabaseQueryRequest{
+				Filter: notion.AndCompoundFilter{
+					notion.PropertyFilter{
 						Property: "Status",
-						Select: &notionapi.SelectFilterCondition{
+						Select: &notion.SelectFilterCondition{
 							Equals: "Reading",
 						},
 					},
-					notionapi.PropertyFilter{
+					notion.PropertyFilter{
 						Property: "Publisher",
-						Select: &notionapi.SelectFilterCondition{
+						Select: &notion.SelectFilterCondition{
 							Equals: "NYT",
 						},
 					},
@@ -528,24 +528,24 @@ func TestDatabaseQueryRequest_MarshalJSON(t *testing.T) {
 		},
 		{
 			name: "compound filter two levels",
-			req: &notionapi.DatabaseQueryRequest{
-				Filter: notionapi.OrCompoundFilter{
-					notionapi.PropertyFilter{
+			req: &notion.DatabaseQueryRequest{
+				Filter: notion.OrCompoundFilter{
+					notion.PropertyFilter{
 						Property: "Description",
-						RichText: &notionapi.TextFilterCondition{
+						RichText: &notion.TextFilterCondition{
 							Contains: "fish",
 						},
 					},
-					notionapi.AndCompoundFilter{
-						notionapi.PropertyFilter{
+					notion.AndCompoundFilter{
+						notion.PropertyFilter{
 							Property: "Food group",
-							Select: &notionapi.SelectFilterCondition{
+							Select: &notion.SelectFilterCondition{
 								Equals: "🥦Vegetable",
 							},
 						},
-						notionapi.PropertyFilter{
+						notion.PropertyFilter{
 							Property: "Is protein rich?",
-							Checkbox: &notionapi.CheckboxFilterCondition{
+							Checkbox: &notion.CheckboxFilterCondition{
 								Equals: true,
 							},
 						},

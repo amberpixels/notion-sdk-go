@@ -1,10 +1,17 @@
-# notionapi
+<div align="center">
+    <h1>Notion SDK for Go</h1>
+    <p>
+        <b>A simple and feature-rich Go client for the <a href="https://developers.notion.com">Notion API</a></b>
+    </p>
+    <p>
+        This project is a <b>hard fork</b> of [jomei/notionapi](https://github.com/jomei/notionapi), focusing on introducing new features, breaking changes, and enhanced API coverage.
+    </p>
+    <br>
+</div>
 
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/jomei/notionapi?label=go%20module)](https://github.com/jomei/notionapi/tags)
-[![Go Reference](https://pkg.go.dev/badge/github.com/jomei/notionapi.svg)](https://pkg.go.dev/github.com/jomei/notionapi)
-[![Test](https://github.com/jomei/notionapi/actions/workflows/test.yml/badge.svg)](https://github.com/jomei/notionapi/actions/workflows/test.yml)
-
-This is a Golang implementation of an API client for the [Notion API](https://developers.notion.com/).
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/amberpixels/notion-sdk-go?label=go%20module)](https://gi?label=go%20module)](https://github.com/amberpixels/notion-sdk-go/tags)
+[![Go Reference](https://pkg.go.dev/badge/github.com/amberpixels/notion-sdk-go.svg)](https://pkg.go.dev/github.com/amberpixels/notion-sdk-go)
+[![Test](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml/badge.svg)](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml)
 
 ## Supported APIs
 
@@ -13,7 +20,7 @@ It supports all APIs of the Notion API version `2022-06-28`.
 ## Installation
 
 ```bash
-go get github.com/jomei/notionapi
+go get github.com/amberpixels/notion-sdk-go
 ```
 
 ## Usage
@@ -25,9 +32,9 @@ First, please follow the [Getting Started Guide](https://developers.notion.com/d
 Import this library and initialize the API client using the obtained integration token.
 
 ```go
-import "github.com/jomei/notionapi"
+import "github.com/amberpixels/notion-sdk-go"
 
-client := notionapi.NewClient("your_integration_token")
+client := notion.NewClient("your_integration_token")
 ```
 
 ### Calling the API

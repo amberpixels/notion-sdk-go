@@ -1,25 +1,25 @@
-package ntast
+package notionast
 
 import (
 	"testing"
 
-	nt "github.com/jomei/notionapi"
+	notion "github.com/amberpixels/notion-sdk-go"
 )
 
 func TestFromBlocks(t *testing.T) {
 	// Create blocks
-	childBlock1 := nt.NewParagraphBlock(nt.Paragraph{})
+	childBlock1 := notion.NewParagraphBlock(notion.Paragraph{})
 	childBlock1.ID = "child1-id"
 
-	childBlock2 := nt.NewParagraphBlock(nt.Paragraph{})
+	childBlock2 := notion.NewParagraphBlock(notion.Paragraph{})
 	childBlock2.ID = "child2-id"
 
-	paragraphBlock := nt.NewParagraphBlock(nt.Paragraph{
-		Children: nt.Blocks{childBlock1, childBlock2},
+	paragraphBlock := notion.NewParagraphBlock(notion.Paragraph{
+		Children: notion.Blocks{childBlock1, childBlock2},
 	})
 	paragraphBlock.ID = "paragraph-id"
 
-	blocks := nt.Blocks{paragraphBlock}
+	blocks := notion.Blocks{paragraphBlock}
 
 	// Build the tree
 	node := FromBlocks(blocks, nil)

@@ -244,6 +244,12 @@ const (
 )
 
 const (
+	RichTextTypeText     RichTextType = "text"
+	RichTextTypeMention  RichTextType = "mention"
+	RichTextTypeEquation RichTextType = "equation"
+)
+
+const (
 	FileTypeFile     FileType = "file"
 	FileTypeExternal FileType = "external"
 )

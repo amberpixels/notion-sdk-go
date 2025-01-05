@@ -35,69 +35,6 @@ func (c Color) MarshalText() ([]byte, error) {
 	return []byte(c), nil
 }
 
-type MentionType string
-
-func (mType MentionType) String() string {
-	return string(mType)
-}
-
-type DatabaseMention struct {
-	ID ObjectID `json:"id"`
-}
-
-type PageMention struct {
-	ID ObjectID `json:"id"`
-}
-
-type TemplateMentionType string
-
-func (tMType TemplateMentionType) String() string {
-	return string(tMType)
-}
-
-type TemplateMention struct {
-	Type                TemplateMentionType `json:"type"`
-	TemplateMentionUser string              `json:"template_mention_user,omitempty"`
-	TemplateMentionDate string              `json:"template_mention_date,omitempty"`
-}
-
-type Mention struct {
-	Type            MentionType      `json:"type,omitempty"`
-	Database        *DatabaseMention `json:"database,omitempty"`
-	Page            *PageMention     `json:"page,omitempty"`
-	User            *User            `json:"user,omitempty"`
-	Date            *DateObject      `json:"date,omitempty"`
-	TemplateMention *TemplateMention `json:"template_mention,omitempty"`
-}
-
-type RichText struct {
-	Type        ObjectType   `json:"type,omitempty"`
-	Text        *Text        `json:"text,omitempty"`
-	Mention     *Mention     `json:"mention,omitempty"`
-	Equation    *Equation    `json:"equation,omitempty"`
-	Annotations *Annotations `json:"annotations,omitempty"`
-	PlainText   string       `json:"plain_text,omitempty"`
-	Href        string       `json:"href,omitempty"`
-}
-
-type Text struct {
-	Content string `json:"content"`
-	Link    *Link  `json:"link,omitempty"`
-}
-
-type Link struct {
-	Url string `json:"url,omitempty"`
-}
-
-type Annotations struct {
-	Bold          bool  `json:"bold"`
-	Italic        bool  `json:"italic"`
-	Strikethrough bool  `json:"strikethrough"`
-	Underline     bool  `json:"underline"`
-	Code          bool  `json:"code"`
-	Color         Color `json:"color,omitempty"`
-}
-
 type RelationObject struct {
 	Database           DatabaseID `json:"database"`
 	SyncedPropertyName string     `json:"synced_property_name"`

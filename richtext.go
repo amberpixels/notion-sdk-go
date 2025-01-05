@@ -53,8 +53,14 @@ type Mention struct {
 	TemplateMention *TemplateMention `json:"template_mention,omitempty"`
 }
 
+type RichTextType string
+
+func (rtType RichTextType) String() string {
+	return string(rtType)
+}
+
 type RichText struct {
-	Type        ObjectType   `json:"type,omitempty"`
+	Type        RichTextType `json:"type,omitempty"`
 	Text        *Text        `json:"text,omitempty"`
 	Mention     *Mention     `json:"mention,omitempty"`
 	Equation    *Equation    `json:"equation,omitempty"`
@@ -139,7 +145,7 @@ func (rt *RichText) AnnotateColor(color Color) *RichText {
 // It fully builds the RichText object with all fields populated.
 func NewTextRichText(text string) *RichText {
 	return &RichText{
-		Type: ObjectTypeText,
+		Type: RichTextTypeText,
 		Text: &Text{
 			Content: text,
 		},
@@ -151,7 +157,7 @@ func NewTextRichText(text string) *RichText {
 // It fully builds the RichText object with all fields populated.
 func NewLinkRichText(content, link string) *RichText {
 	return &RichText{
-		Type: ObjectTypeText,
+		Type: RichTextTypeText,
 		Text: &Text{
 			Content: content,
 			Link: &Link{
@@ -167,7 +173,7 @@ func NewLinkRichText(content, link string) *RichText {
 /*
 func NewDatabaseMentionRichText(databaseID ObjectID) *RichText {
 	return &RichText{
-		Type: ObjectTypeText,
+		Type: RichTextTypeText,
 		Mention: &Mention{
 			Type: MentionTypeDatabase,
 			Database: &DatabaseMention{

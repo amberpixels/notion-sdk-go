@@ -3,13 +3,13 @@
     <p>
         <b>A simple and feature-rich Go client for the <a href="https://developers.notion.com">Notion API</a></b>
     </p>
-    <p>
-        This project is a <b>hard fork</b> of [jomei/notionapi](https://github.com/jomei/notionapi), focusing on introducing new features, breaking changes, and enhanced API coverage.
-    </p>
     <br>
 </div>
 
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/amberpixels/notion-sdk-go?label=go%20module)](https://gi?label=go%20module)](https://github.com/amberpixels/notion-sdk-go/tags)
+👋 This project is a *hard fork* of [jomei/notionapi](https://github.com/jomei/notionapi),
+focusing on introducing new features, breaking changes, and enhanced API coverage.
+
+[![GitHub tag (latest)](https://img.shields.io/github/v/tag/amberpixels/notion-sdk-go?label=go%20module)](https://github.com/amberpixels/notion-sdk-go/tags)
 [![Go Reference](https://pkg.go.dev/badge/github.com/amberpixels/notion-sdk-go.svg)](https://pkg.go.dev/github.com/amberpixels/notion-sdk-go)
 [![Test](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml/badge.svg)](https://github.com/amberpixels/notion-sdk-go/actions/workflows/test.yml)
 

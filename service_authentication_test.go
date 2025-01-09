@@ -1,0 +1,79 @@
+package notion_test
+
+import (
+	"context"
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	notion "github.com/amberpixels/notion-sdk-go"
+)
+
+func TestAuthenticationService(t *testing.T) {
+	t.Run("CreateToken", func(t *testing.T) {
+		tests := []struct {
+			name       string
+			filePath   string
+			statusCode int
+			request    *notion.TokenCreateRequest
+			want       *notion.TokenCreateResponse
+			wantErr    error
+		}{
+			{
+				name:       "Creates token",
+				filePath:   "testdata/create_token.json",
+				statusCode: http.StatusOK,
+				request: &notion.TokenCreateRequest{
+					Code:        "code1",
+					GrantType:   "authorization_code",
+					RedirectUri: "www.example.com",
+				},
+				want: &notion.TokenCreateResponse{
+					AccessToken:          "token1",
+					BotId:                "bot1",
+					DuplicatedTemplateId: "template_id1",
+					WorkspaceIcon:        "🎉",
+					WorkspaceId:          "workspaceid_1",
+					WorkspaceName:        "workspace_1",
+				},
+				wantErr: nil,
+			},
+			{
+				name:       "Fails to create token",
+				filePath:   "testdata/create_token_error.json",
+				statusCode: http.StatusBadRequest,
+				request: &notion.TokenCreateRequest{
+					Code:        "code1",
+					GrantType:   "authorization_code",
+					RedirectUri: "www.example.com",
+				},
+				wantErr: &notion.TokenCreateError{
+					Code:    "invalid_grant",
+					Message: "Invalid code.",
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				// Mock client
+				c := newMockedClient(t, tt.filePath, tt.statusCode)
+				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+
+				// Call method under test
+				got, gotErr := notion.NewAuthenticationService(client).CreateToken(context.Background(), tt.request)
+
+				// Assertions
+				if tt.wantErr != nil {
+					assert.Error(t, gotErr)
+					assert.Equal(t, tt.wantErr, gotErr, "error mismatch")
+				} else {
+					require.NoError(t, gotErr)
+				}
+				assert.Equal(t, tt.want, got, "response mismatch")
+			})
+		}
+	})
+}

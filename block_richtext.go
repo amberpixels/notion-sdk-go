@@ -1,10 +1,13 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/rich-text
+//            https://developers.notion.com/reference/rich-text#the-annotation-object
+
 // RichTextType is a type of a RichText
 type RichTextType string
 
 // String returns the string representation of the RichTextType
-func (rtType RichTextType) String() string { return string(rtType) }
+func (t RichTextType) String() string { return string(t) }
 
 const (
 	RichTextTypeText     RichTextType = "text"
@@ -109,64 +112,4 @@ func (rt RichText) WithColor(color Color) RichText {
 
 	rt.Annotations.Color = color
 	return rt
-}
-
-// NewTextRichText creates a new RichText with the given text
-// It fully builds the RichText object with all fields populated.
-func NewTextRichText(text string) RichText {
-	return RichText{
-		Type: RichTextTypeText,
-		Text: &Text{
-			Content: text,
-		},
-		PlainText: text,
-	}
-}
-
-// NewLinkRichText creates a new RichText with the given content and link
-// It fully builds the RichText object with all fields populated.
-func NewLinkRichText(content, link string) RichText {
-	return RichText{
-		Type: RichTextTypeText,
-		Text: &Text{
-			Content: content,
-			Link: &Link{
-				Url: link,
-			},
-		},
-		PlainText: content,
-		Href:      link,
-	}
-}
-
-func NewDatabaseMentionRichText(databaseID ObjectID) *RichText {
-	return &RichText{
-		Type: RichTextTypeText,
-		Mention: &Mention{
-			Type: MentionTypeDatabase,
-			Database: &DatabaseMention{
-				ID: databaseID,
-			},
-		},
-	}
-}
-
-func NewPageMentionRichText(pageID ObjectID) *RichText {
-	return &RichText{
-		Type: RichTextTypeText,
-		Mention: &Mention{
-			Type: MentionTypePage,
-			Page: &PageMention{ID: pageID},
-		},
-	}
-}
-
-func NewUserMentionRichText(userID ObjectID) *RichText {
-	return &RichText{
-		Type: RichTextTypeText,
-		Mention: &Mention{
-			Type: MentionTypeUser,
-			User: &UserMention{ID: userID},
-		},
-	}
 }

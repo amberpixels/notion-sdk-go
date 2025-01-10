@@ -12,10 +12,15 @@ import (
 )
 
 func TestBlocksService(t *testing.T) {
+	ctx := context.Background()
+
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	user := notion.NewPersonUser("some_id", "some_user@example.com")
+
 	t.Run("GetChildren", func(t *testing.T) {
 		tests := []struct {
 			name       string
@@ -38,8 +43,8 @@ func TestBlocksService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewBlocksService(client).GetChildren(context.Background(), tt.id, nil)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Blocks.GetChildren(ctx, tt.id, nil)
 
 				if (err != nil) != tt.wantErr {
 					t.Errorf("GetChildren() error = %v, wantErr %v", err, tt.wantErr)
@@ -71,60 +76,28 @@ func TestBlocksService(t *testing.T) {
 				filePath:   "testdata/block_append_children.json",
 				statusCode: http.StatusOK,
 				request: &notion.AppendBlockChildrenRequest{
-					Children: []notion.Block{
-						&notion.Heading2Block{
-							BaseBlock: notion.BaseBlock{
-								Object: notion.ObjectTypeBlock,
-								Type:   notion.BlockTypeHeading2,
-							},
-							Heading2: struct {
-								RichText     []notion.RichText `json:"rich_text"`
-								Children     notion.Blocks     `json:"children,omitempty"`
-								Color        string            `json:"color,omitempty"`
-								IsToggleable bool              `json:"is_toggleable,omitempty"`
-							}{[]notion.RichText{
-								{
-									Type: notion.RichTextTypeText,
-									Text: &notion.Text{Content: "Hello"},
+					Children: notion.Blocks{
+						decorateTestBasicBlock(notion.NewHeading2Block(
+							notion.Heading{
+								RichText: notion.RichTexts{
+									notion.NewTextRichText("Hello"),
 								},
-							}, nil, "", false,
 							},
-						},
+						), "block1", &timestamp, user),
 					},
 				},
 				want: &notion.AppendBlockChildrenResponse{
 					Object: notion.ObjectTypeList,
-					Results: []notion.Block{&notion.ParagraphBlock{
-						BaseBlock: notion.BaseBlock{
-							Object:         notion.ObjectTypeBlock,
-							ID:             "some_id",
-							CreatedTime:    &timestamp,
-							LastEditedTime: &timestamp,
-							Type:           notion.BlockTypeParagraph,
-							CreatedBy: &notion.User{
-								Object: "user",
-								ID:     "some_id",
-							},
-							LastEditedBy: &notion.User{
-								Object: "user",
-								ID:     "some_id",
-							},
-						},
-						Paragraph: notion.Paragraph{
-							RichText: []notion.RichText{
-								{
-									Type: notion.RichTextTypeText,
-									Text: &notion.Text{Content: "AAAAAA"},
-									Annotations: &notion.Annotations{
-										Bold:  true,
-										Color: notion.ColorDefault,
-									},
-									PlainText: "AAAAAA",
+
+					Results: notion.Blocks{
+						decorateTestBasicBlock(notion.NewHeading2Block(
+							notion.Heading{
+								RichText: notion.RichTexts{
+									notion.NewTextRichText("Hello"),
 								},
 							},
-							Color: "blue",
-						},
-					}},
+						), "block1", &timestamp, user),
+					},
 				},
 			},
 		}
@@ -132,8 +105,8 @@ func TestBlocksService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewBlocksService(client).AppendChildren(context.Background(), tt.id, tt.request)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Blocks.AppendChildren(ctx, tt.id, tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("AppendChildren() error = %v, wantErr %v", err, tt.wantErr)
 					return
@@ -171,43 +144,17 @@ func TestBlocksService(t *testing.T) {
 				filePath:   "testdata/block_get.json",
 				statusCode: http.StatusOK,
 				id:         "some_id",
-				want: &notion.ChildPageBlock{
-					BaseBlock: notion.BaseBlock{
-						Object:         notion.ObjectTypeBlock,
-						ID:             "some_id",
-						Type:           notion.BlockTypeChildPage,
-						CreatedTime:    &timestamp,
-						LastEditedTime: &timestamp,
-						CreatedBy: &notion.User{
-							Object: "user",
-							ID:     "some_id",
-						},
-						LastEditedBy: &notion.User{
-							Object: "user",
-							ID:     "some_id",
-						},
-						HasChildren: true,
-						Parent: &notion.Parent{
-							Type:   "page_id",
-							PageID: "59833787-2cf9-4fdf-8782-e53db20768a5",
-						},
-					},
-					ChildPage: struct {
-						Title string `json:"title"`
-					}{
-						Title: "Hello",
-					},
-				},
-				wantErr: false,
-				err:     nil,
+				want:       decorateTestBasicBlock(notion.NewChildPageBlock("Hello"), "some_id", &timestamp, user),
+				wantErr:    false,
+				err:        nil,
 			},
 		}
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewBlocksService(client).Get(context.Background(), tt.id)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Blocks.Get(ctx, tt.id)
 
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -238,36 +185,19 @@ func TestBlocksService(t *testing.T) {
 				id:         "some_id",
 				req: &notion.BlockUpdateRequest{
 					Paragraph: &notion.Paragraph{
-						RichText: []notion.RichText{
-							{
-								Text: &notion.Text{Content: "Hello"},
-							},
+						RichText: notion.RichTexts{
+							notion.NewTextRichText("Hello"),
 						},
-						Color: notion.ColorYellow.String(),
+						Color: notion.ColorYellow,
 					},
 				},
-				want: &notion.ParagraphBlock{
-					BaseBlock: notion.BaseBlock{
-						Object:         notion.ObjectTypeBlock,
-						ID:             "some_id",
-						Type:           notion.BlockTypeParagraph,
-						CreatedTime:    &timestamp,
-						LastEditedTime: &timestamp,
-					},
-					Paragraph: notion.Paragraph{
-						RichText: []notion.RichText{
-							{
-								Type: notion.RichTextTypeText,
-								Text: &notion.Text{
-									Content: "Hello",
-								},
-								Annotations: &notion.Annotations{Color: notion.ColorDefault},
-								PlainText:   "Hello",
-							},
+				want: decorateTestBasicBlock(
+					notion.NewParagraphBlock(notion.Paragraph{
+						RichText: notion.RichTexts{
+							notion.NewTextRichText("Hello"),
 						},
-						Color: notion.ColorYellow.String(),
-					},
-				},
+						Color: notion.ColorYellow,
+					}), "some_id", &timestamp, user),
 				wantErr: false,
 				err:     nil,
 			},
@@ -276,8 +206,8 @@ func TestBlocksService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewBlocksService(client).Update(context.Background(), tt.id, tt.req)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Blocks.Update(ctx, tt.id, tt.req)
 
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)

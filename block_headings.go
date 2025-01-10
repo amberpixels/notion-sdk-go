@@ -1,48 +1,61 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#headings
+
+// Heading stores the heading data.
 type Heading struct {
 	AtomChildren
 
 	RichText     RichTexts `json:"rich_text"`
-	Color        string    `json:"color,omitempty"`
+	Color        Color     `json:"color,omitempty"`
 	IsToggleable bool      `json:"is_toggleable,omitempty"`
 }
 
+// Heading1Block is a Notion block for Heading1
 type Heading1Block struct {
-	BaseBlock
+	BasicBlock
 	Heading1 Heading `json:"heading_1"`
 }
+
+// Heading2Block is a Notion block for Heading2
 type Heading2Block struct {
-	BaseBlock
+	BasicBlock
 	Heading2 Heading `json:"heading_2"`
 }
+
+// Heading3Block is a Notion block for Heading3
 type Heading3Block struct {
-	BaseBlock
+	BasicBlock
 	Heading3 Heading `json:"heading_3"`
 }
 
-var _ Block = (*Heading1Block)(nil)
-var _ Block = (*Heading2Block)(nil)
-var _ Block = (*Heading3Block)(nil)
+var (
+	_ Block = (*Heading1Block)(nil)
+	_ Block = (*Heading2Block)(nil)
+	_ Block = (*Heading3Block)(nil)
+)
 
+// NewHeading1Block returns a new Heading1Block with the given heading
 func NewHeading1Block(h Heading) *Heading1Block {
 	return &Heading1Block{
-		BaseBlock: NewBaseBlock(BlockTypeColumn, h.ChildCount() > 0),
-		Heading1:  h,
+		BasicBlock: NewBasicBlock(BlockTypeColumn, h.ChildCount() > 0),
+		Heading1:   h,
 	}
 }
 
+// NewHeading2Block returns a new Heading2Block with the given heading
 func NewHeading2Block(h Heading) *Heading2Block {
 	return &Heading2Block{
-		BaseBlock: NewBaseBlock(BlockTypeColumn, h.ChildCount() > 0),
-		Heading2:  h,
+		BasicBlock: NewBasicBlock(BlockTypeColumn, h.ChildCount() > 0),
+		Heading2:   h,
 	}
 }
 
+// NewHeading3Block returns a new Heading3Block with the given heading
 func NewHeading3Block(h Heading) *Heading3Block {
 	return &Heading3Block{
-		BaseBlock: NewBaseBlock(BlockTypeColumn, h.ChildCount() > 0),
-		Heading3:  h,
+		BasicBlock: NewBasicBlock(BlockTypeColumn, h.ChildCount() > 0),
+		Heading3:   h,
 	}
 }
 
@@ -109,3 +122,9 @@ var (
 	_ Block             = (*Heading3Block)(nil)
 	_ HierarchicalBlock = (*Heading3Block)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeHeading1, func() Block { return &Heading1Block{} })
+	registerBlockDecoder(BlockTypeHeading2, func() Block { return &Heading2Block{} })
+	registerBlockDecoder(BlockTypeHeading3, func() Block { return &Heading3Block{} })
+}

@@ -24,10 +24,6 @@ const (
 	maxRetries           = 3
 )
 
-type Token string
-
-func (t Token) String() string { return string(t) }
-
 type errJsonDecodeFunc func(data []byte) error
 
 // Client is a Notion API client.
@@ -63,10 +59,23 @@ func newClientAPI(token Token) *clientAPI {
 		apiVersion:    apiVersion,
 		notionVersion: currentNotionVersion,
 		maxRetries:    maxRetries,
+
+		errDecoder: func(data []byte) error {
+			var apiErr APIError
+			err := json.Unmarshal(data, &apiErr)
+			if err != nil {
+				return err
+			}
+			return &apiErr
+		},
 	}
 }
 
 func (c *clientAPI) request(ctx context.Context, method string, path string, params map[string]string, payload any) (*http.Response, error) {
+	return c.requestRaw(ctx, method, path, params, payload, false, c.errDecoder)
+}
+
+func (c *clientAPI) requestRaw(ctx context.Context, method string, path string, params map[string]string, payload any, basicAuth bool, customErrDecoder errJsonDecodeFunc) (*http.Response, error) {
 	u, err := c.parsedBaseURL.Parse(fmt.Sprintf("%s/%s", c.apiVersion, path))
 	if err != nil {
 		return nil, err
@@ -93,7 +102,7 @@ func (c *clientAPI) request(ctx context.Context, method string, path string, par
 		return nil, err
 	}
 
-	if c.oauthID != "" {
+	if basicAuth {
 		cred := base64.StdEncoding.EncodeToString([]byte(c.oauthID + ":" + c.oauthSecret))
 		req.Header.Add("Authorization", fmt.Sprintf("Basic %s", cred))
 	} else {
@@ -142,17 +151,8 @@ func (c *clientAPI) request(ctx context.Context, method string, path string, par
 		if err != nil {
 			return nil, err
 		}
-		return nil, c.errDecoder(data)
+		return nil, customErrDecoder(data)
 	}
 
 	return res, nil
-}
-
-func decodeClientError(data []byte) error {
-	var apiErr APIError
-	err := json.Unmarshal(data, &apiErr)
-	if err != nil {
-		return err
-	}
-	return &apiErr
 }

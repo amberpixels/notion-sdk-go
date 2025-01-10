@@ -17,8 +17,8 @@ type PagesService struct {
 	api *clientAPI
 }
 
-// NewPagesService creates an instance of PagesService.
-func NewPagesService(api *clientAPI) *PagesService {
+// newPagesService creates an instance of PagesService.
+func newPagesService(api *clientAPI) *PagesService {
 	return &PagesService{api: api}
 }
 

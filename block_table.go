@@ -1,7 +1,8 @@
 package notion
 
-// Ref: https://developers.notion.com/reference/block#table
+// Reference: http://developers.notion.com/reference/block#table
 
+// Table is a type for table blocks
 type Table struct {
 	AtomChildren
 
@@ -10,31 +11,36 @@ type Table struct {
 	HasRowHeader    bool `json:"has_row_header"`
 }
 
+// TableBlock is a Notion block for table blocks
 type TableBlock struct {
-	BaseBlock
+	BasicBlock
 	Table Table `json:"table"`
 }
 
+// TableRow is a type for table row blocks
 type TableRow struct {
 	Cells []RichTexts `json:"cells"`
 }
 
+// TableRowBlock is a Notion block for table row blocks
 type TableRowBlock struct {
-	BaseBlock
+	BasicBlock
 	TableRow TableRow `json:"table_row"`
 }
 
+// NewTableRowBlock creates a new TableRowBlock
 func NewTableRowBlock(tr TableRow) *TableRowBlock {
 	return &TableRowBlock{
-		BaseBlock: NewBaseBlock(BlockTypeTableRow),
-		TableRow:  tr,
+		BasicBlock: NewBasicBlock(BlockTypeTableRow),
+		TableRow:   tr,
 	}
 }
 
+// NewTableBlock creates a new TableBlock
 func NewTableBlock(table Table) *TableBlock {
 	return &TableBlock{
-		BaseBlock: NewBaseBlock(BlockTypeTable, table.ChildCount() > 0),
-		Table:     table,
+		BasicBlock: NewBasicBlock(BlockTypeTable, table.ChildCount() > 0),
+		Table:      table,
 	}
 }
 
@@ -57,3 +63,8 @@ var (
 	_ Block             = (*TableRowBlock)(nil)
 	_ HierarchicalBlock = (*TableRowBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeTable, func() Block { return &TableBlock{} })
+	registerBlockDecoder(BlockTypeTableRow, func() Block { return &TableRowBlock{} })
+}

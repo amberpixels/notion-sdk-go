@@ -17,8 +17,8 @@ type UsersService struct {
 	api *clientAPI
 }
 
-// NewUsersService creates an instance of UsersService.
-func NewUsersService(api *clientAPI) *UsersService {
+// newUsersService creates an instance of UsersService.
+func newUsersService(api *clientAPI) *UsersService {
 	return &UsersService{api: api}
 }
 

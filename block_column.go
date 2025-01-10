@@ -1,18 +1,23 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#column-list-and-column
+
+// Column stores the children of the column block
 type Column struct {
 	AtomChildren
 }
 
+// ColumnBlock is a Notion block for Column
 type ColumnBlock struct {
-	BaseBlock
+	BasicBlock
 	Column Column `json:"column"`
 }
 
+// NewColumnBlock returns a new ColumnBlock with the given column
 func NewColumnBlock(col Column) *ColumnBlock {
 	return &ColumnBlock{
-		BaseBlock: NewBaseBlock(BlockTypeColumn, col.ChildCount() > 0),
-		Column:    col,
+		BasicBlock: NewBasicBlock(BlockTypeColumn, col.ChildCount() > 0),
+		Column:     col,
 	}
 }
 
@@ -32,3 +37,7 @@ var (
 	_ Block             = (*ColumnBlock)(nil)
 	_ HierarchicalBlock = (*ColumnBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeColumn, func() Block { return &ColumnBlock{} })
+}

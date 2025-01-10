@@ -5,6 +5,7 @@ import (
 	"time"
 
 	notion "github.com/amberpixels/notion-sdk-go"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPdfBlockImplementsDownloadableFileBlock(t *testing.T) {
@@ -20,14 +21,10 @@ func TestPdfBlockImplementsDownloadableFileBlock(t *testing.T) {
 	}
 
 	// Test GetURL
-	if url := pdfBlock.GetURL(); url != "https://example.com/file.pdf" {
-		t.Errorf("Expected URL to be 'https://example.com/file.pdf', got %s", url)
-	}
+	assert.Equal(t, "https://example.com/file.pdf", pdfBlock.GetURL(), "Unexpected URL")
 
 	// Test GetExpiryTime
-	if expiry := pdfBlock.GetExpiryTime(); expiry != &now {
-		t.Errorf("Expected expiry time to be %v, got %v", now, expiry)
-	}
+	assert.Equal(t, &now, pdfBlock.GetExpiryTime(), "Unexpected expiry time")
 }
 
 func TestFileBlockImplementsDownloadableFileBlock(t *testing.T) {
@@ -43,14 +40,10 @@ func TestFileBlockImplementsDownloadableFileBlock(t *testing.T) {
 	}
 
 	// Test GetURL
-	if url := fileBlock.GetURL(); url != "https://example.com/file.txt" {
-		t.Errorf("Expected URL to be 'https://example.com/file.txt', got %s", url)
-	}
+	assert.Equal(t, "https://example.com/file.txt", fileBlock.GetURL(), "Unexpected URL")
 
 	// Test GetExpiryTime
-	if expiry := fileBlock.GetExpiryTime(); expiry != &now {
-		t.Errorf("Expected expiry time to be %v, got %v", now, expiry)
-	}
+	assert.Equal(t, &now, fileBlock.GetExpiryTime(), "Unexpected expiry time")
 }
 
 func TestImageBlockImplementsDownloadableFileBlock(t *testing.T) {
@@ -66,14 +59,10 @@ func TestImageBlockImplementsDownloadableFileBlock(t *testing.T) {
 	}
 
 	// Test GetURL
-	if url := imageBlock.GetURL(); url != "https://example.com/image.jpg" {
-		t.Errorf("Expected URL to be 'https://example.com/image.jpg', got %s", url)
-	}
+	assert.Equal(t, "https://example.com/image.jpg", imageBlock.GetURL(), "Unexpected URL")
 
 	// Test GetExpiryTime
-	if expiry := imageBlock.GetExpiryTime(); expiry != &now {
-		t.Errorf("Expected expiry time to be %v, got %v", now, expiry)
-	}
+	assert.Equal(t, &now, imageBlock.GetExpiryTime(), "Unexpected expiry time")
 }
 
 func TestExternalURLCases(t *testing.T) {
@@ -120,9 +109,7 @@ func TestExternalURLCases(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			if url := tc.block.GetURL(); url != tc.expected {
-				t.Errorf("Expected URL to be '%s', got '%s'", tc.expected, url)
-			}
+			assert.Equal(t, tc.expected, tc.block.GetURL(), "Unexpected URL")
 		})
 	}
 }

@@ -18,8 +18,8 @@ type DatabasesService struct {
 	api *clientAPI
 }
 
-// NewDatabasesService creates an instance of DatabasesService.
-func NewDatabasesService(api *clientAPI) *DatabasesService {
+// newDatabasesService creates an instance of DatabasesService.
+func newDatabasesService(api *clientAPI) *DatabasesService {
 	return &DatabasesService{api: api}
 }
 

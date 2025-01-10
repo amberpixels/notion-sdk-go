@@ -16,8 +16,8 @@ type CommentsService struct {
 	api *clientAPI
 }
 
-// NewCommentsService creates an instance CommentsService.
-func NewCommentsService(api *clientAPI) *CommentsService {
+// newCommentsService creates an instance CommentsService.
+func newCommentsService(api *clientAPI) *CommentsService {
 	return &CommentsService{api: api}
 }
 

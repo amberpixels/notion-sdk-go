@@ -1,7 +1,8 @@
 package notion
 
-// Ref: https://developers.notion.com/reference/block#to-do
+// Reference: https://developers.notion.com/reference/block#to-do
 
+// ToDo is a type for to-do blocks
 type ToDo struct {
 	AtomChildren
 	RichText RichTexts `json:"rich_text"`
@@ -9,15 +10,17 @@ type ToDo struct {
 	Color    string    `json:"color,omitempty"`
 }
 
+// ToDoBlock is a Notion block for to-do blocks
 type ToDoBlock struct {
-	BaseBlock
+	BasicBlock
 	ToDo ToDo `json:"to_do"`
 }
 
+// NewToDoBlock creates a new ToDoBlock
 func NewToDoBlock(t ToDo) *ToDoBlock {
 	return &ToDoBlock{
-		BaseBlock: NewBaseBlock(BlockTypeToDo, t.ChildCount() > 0),
-		ToDo:      t,
+		BasicBlock: NewBasicBlock(BlockTypeToDo, t.ChildCount() > 0),
+		ToDo:       t,
 	}
 }
 
@@ -37,3 +40,7 @@ var (
 	_ Block             = (*ToDoBlock)(nil)
 	_ HierarchicalBlock = (*ToDoBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeToDo, func() Block { return &ToDoBlock{} })
+}

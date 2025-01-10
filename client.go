@@ -2,6 +2,7 @@ package notion
 
 import "net/http"
 
+// Client is a Notion SDK client.
 type Client struct {
 	api *clientAPI
 
@@ -9,11 +10,18 @@ type Client struct {
 	Blocks    *BlocksService
 	Pages     *PagesService
 	Databases *DatabasesService
+	Users     *UsersService
 	Comments  *CommentsService
 	Search    *SearchService
 }
 
-// New creates a new Client. d
+// Token is a type for Notion API tokens.
+type Token string
+
+// String returns the string representation of the Token.
+func (t Token) String() string { return string(t) }
+
+// New creates a new Client with the given token and options.
 func New(token Token, opts ...ClientOpt) *Client {
 	api := newClientAPI(token)
 
@@ -25,12 +33,13 @@ func New(token Token, opts ...ClientOpt) *Client {
 		opt(c)
 	}
 
-	c.Auth = NewAuthenticationService(api)
-	c.Blocks = NewBlocksService(api)
-	c.Pages = NewPagesService(api)
-	c.Databases = NewDatabasesService(api)
-	c.Comments = NewCommentsService(api)
-	c.Search = NewSearchService(api)
+	c.Auth = newAuthenticationService(api)
+	c.Blocks = newBlocksService(api)
+	c.Pages = newPagesService(api)
+	c.Databases = newDatabasesService(api)
+	c.Users = newUsersService(api)
+	c.Comments = newCommentsService(api)
+	c.Search = newSearchService(api)
 
 	return c
 }

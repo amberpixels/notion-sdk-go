@@ -12,8 +12,8 @@ type AuthenticationService struct {
 	api *clientAPI
 }
 
-// NewAuthenticationService creates an instance of AuthenticationService.
-func NewAuthenticationService(api *clientAPI) *AuthenticationService {
+// newAuthenticationService creates an instance of AuthenticationService.
+func newAuthenticationService(api *clientAPI) *AuthenticationService {
 	return &AuthenticationService{api: api}
 }
 
@@ -22,7 +22,7 @@ func NewAuthenticationService(api *clientAPI) *AuthenticationService {
 //
 // See https://developers.notion.com/reference/create-a-token
 func (s *AuthenticationService) CreateToken(ctx context.Context, request *TokenCreateRequest) (*TokenCreateResponse, error) {
-	res, err := s.api.request(ctx, http.MethodPost, "oauth/token", nil, request, true, decodeTokenCreateError)
+	res, err := s.api.requestRaw(ctx, http.MethodPost, "oauth/token", nil, request, true, decodeTokenCreateError)
 	if err != nil {
 		return nil, err
 	}

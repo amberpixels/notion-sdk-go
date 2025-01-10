@@ -4,7 +4,7 @@ import "time"
 
 // Media stands for a group of: audio, video, image, file and pdf blocks
 //
-// Ref:
+// Reference:
 // 	https://developers.notion.com/page/changelog#media-blocks-video-audio-image-file-pdf
 // 	https://developers.notion.com/reference/block#image
 //  https://developers.notion.com/reference/block#file
@@ -13,63 +13,73 @@ import "time"
 //  https://developers.notion.com/reference/block#pdf
 //
 
+// FileBlock is a Notion block for files
 type FileBlock struct {
-	BaseBlock
+	BasicBlock
 	File File `json:"file"`
 }
 
+// NewFileBlock creates a new FileBlock
 func NewFileBlock(file File) *FileBlock {
 	return &FileBlock{
-		BaseBlock: NewBaseBlock(BlockTypeFile),
-		File:      file,
+		BasicBlock: NewBasicBlock(BlockTypeFile),
+		File:       file,
 	}
 }
 
+// PdfBlock is a Notion block for PDF files
 type PdfBlock struct {
-	BaseBlock
+	BasicBlock
 	Pdf File `json:"pdf"`
 }
 
+// NewPdfBlock creates a new PdfBlock
 func NewPdfBlock(pdf File) *PdfBlock {
 	return &PdfBlock{
-		BaseBlock: NewBaseBlock(BlockTypePdf),
-		Pdf:       pdf,
+		BasicBlock: NewBasicBlock(BlockTypePdf),
+		Pdf:        pdf,
 	}
 }
 
+// ImageBlock is a Notion block for images
 type ImageBlock struct {
-	BaseBlock
+	BasicBlock
 	Image File `json:"image"`
 }
 
+// NewImageBlock creates a new ImageBlock
 func NewImageBlock(data File) *ImageBlock {
 	return &ImageBlock{
-		BaseBlock: NewBaseBlock(BlockTypeImage),
-		Image:     data,
+		BasicBlock: NewBasicBlock(BlockTypeImage),
+		Image:      data,
 	}
 }
 
+// AudioBlock is a Notion block for audio files
 type AudioBlock struct {
-	BaseBlock
+	BasicBlock
 	Audio File `json:"audio"`
 }
 
+// NewAudioBlock creates a new AudioBlock
 func NewAudioBlock(audio File) *AudioBlock {
 	return &AudioBlock{
-		BaseBlock: NewBaseBlock(BlockTypeAudio),
-		Audio:     audio,
+		BasicBlock: NewBasicBlock(BlockTypeAudio),
+		Audio:      audio,
 	}
 }
 
+// VideoBlock is a Notion block for video files
 type VideoBlock struct {
-	BaseBlock
+	BasicBlock
 	Video File `json:"video"`
 }
 
+// NewVideoBlock creates a new VideoBlock
 func NewVideoBlock(video File) *VideoBlock {
 	return &VideoBlock{
-		BaseBlock: NewBaseBlock(BlockTypeVideo),
-		Video:     video,
+		BasicBlock: NewBasicBlock(BlockTypeVideo),
+		Video:      video,
 	}
 }
 
@@ -135,3 +145,11 @@ var (
 	_ Block             = (*VideoBlock)(nil)
 	_ HierarchicalBlock = (*VideoBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeFile, func() Block { return &FileBlock{} })
+	registerBlockDecoder(BlockTypePdf, func() Block { return &PdfBlock{} })
+	registerBlockDecoder(BlockTypeImage, func() Block { return &ImageBlock{} })
+	registerBlockDecoder(BlockTypeAudio, func() Block { return &AudioBlock{} })
+	registerBlockDecoder(BlockTypeVideo, func() Block { return &VideoBlock{} })
+}

@@ -12,6 +12,8 @@ import (
 )
 
 func TestSearchClient(t *testing.T) {
+	ctx := context.Background()
+
 	t.Run("Do", func(t *testing.T) {
 		tests := []struct {
 			name       string
@@ -35,10 +37,10 @@ func TestSearchClient(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				// Setup mocked client
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
 				// Perform the search
-				got, err := notion.NewSearchService(client).Do(context.Background(), tt.request)
+				got, err := client.Search.Do(ctx, tt.request)
 
 				// Assert the error
 				if tt.wantErr {

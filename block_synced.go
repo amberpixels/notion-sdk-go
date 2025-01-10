@@ -1,7 +1,8 @@
 package notion
 
-// Ref: https://developers.notion.com/reference/block#synced-block
+// Reference: https://developers.notion.com/reference/block#synced-block
 
+// Synced is a type for synced blocks
 type Synced struct {
 	AtomChildren
 
@@ -9,19 +10,22 @@ type Synced struct {
 	SyncedFrom *SyncedFrom `json:"synced_from"`
 }
 
+// SyncedFrom holds the ID of the original block
 type SyncedFrom struct {
 	BlockID BlockID `json:"block_id"`
 }
 
+// SyncedBlock is a Notion block for synced blocks
 type SyncedBlock struct {
-	BaseBlock
+	BasicBlock
 	Synced Synced `json:"synced_block"`
 }
 
+// NewSyncedBlock creates a new SyncedBlock
 func NewSyncedBlock(s Synced) *SyncedBlock {
 	return &SyncedBlock{
-		BaseBlock: NewBaseBlock(BlockTypeSyncedBlock, s.ChildCount() > 0),
-		Synced:    s,
+		BasicBlock: NewBasicBlock(BlockTypeSyncedBlock, s.ChildCount() > 0),
+		Synced:     s,
 	}
 }
 
@@ -41,3 +45,7 @@ var (
 	_ Block             = (*SyncedBlock)(nil)
 	_ HierarchicalBlock = (*SyncedBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeSyncedBlock, func() Block { return &SyncedBlock{} })
+}

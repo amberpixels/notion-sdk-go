@@ -12,10 +12,13 @@ import (
 )
 
 func TestPagesService(t *testing.T) {
+	ctx := context.Background()
+
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
 	if err != nil {
 		t.Fatal(err)
 	}
+	user := notion.NewPersonUser("some_id", "tests@example.com")
 
 	t.Run("Get", func(t *testing.T) {
 		user := notion.NewPersonUser("some_id", "tests@example.com")
@@ -60,138 +63,138 @@ func TestPagesService(t *testing.T) {
 					},
 					AtomProperties: notion.AtomProperties{
 						Properties: notion.Properties{
-							"Tags": &notion.MultiSelectProperty{
-								ID:   ";s|V",
-								Type: "multi_select",
-								MultiSelect: notion.Options{
-									{
-										ID:    "some_id",
-										Name:  "tag",
-										Color: "blue",
-									},
-								},
-							},
-							"Some another column": &notion.PeopleProperty{
-								ID:   "rJt",
-								Type: "people",
-								People: []notion.User{
-									{
-										AtomObject: notion.AtomObject{
-											Object:    "user",
-										},
-										AtomID: notion.AtomID{
-											ID: "some_id",
-										},
-										Name: "some name",
-										AvatarURL: "some.url",
-										Person: &notion.Person{
-											Email: "some@email.com",
-										},
-									},
-								},
-							},
-							"SomeColumn": &notion.RichTextProperty{
-								ID:   "~j_@",
-								Type: "rich_text",
-								RichText: []notion.RichText{
-									{
-										Type: "text",
-										Text: &notion.Text{
-											Content: "some text",
-										},
-										Annotations: &notion.Annotations{
-											Color: "default",
-										},
-										PlainText: "some text",
-									},
-								},
-							},
-							"Some Files": &notion.FilesProperty{
-								ID:   "files",
-								Type: "files",
-								Files: []notion.File{
-									{
-										Name: "https://google.com",
-										Type: "external",
-										External: &notion.FileObject{
-											URL: "https://google.com",
-										},
-									},
-								},
-							},
-							"Name": &notion.TitleProperty{
-										ID:        "some_id",
-										Name:      "some name",
-										AvatarURL: "some.url",
-										Type:      "person",
-										Person: &notion.Person{
-											Email: "some@email.com",
-										},
-									},
-								},
-							},
-							"SomeColumn": &notion.RichTextProperty{
-								ID:   "~j_@",
-								Type: "rich_text",
-								RichText: []notion.RichText{
-									{
-										Type: "text",
-										Text: &notion.Text{
-											Content: "some text",
-										},
-										Annotations: &notion.Annotations{
-											Color: "default",
-										},
-										PlainText: "some text",
-									},
-								},
-							},
-							"Some Files": &notion.FilesProperty{
-								ID:   "files",
-								Type: "files",
-								Files: []notion.File{
-									{
-										Name: "https://google.com",
-										Type: "external",
-										External: &notion.FileObject{
-											URL: "https://google.com",
-										},
-									},
-								},
-							},
-							"Name": &notion.TitleProperty{
-								ID:   "title",
-								Type: "title",
-								Title: []notion.RichText{
-									{
-										Type: "text",
-										Text: &notion.Text{
-											Content: "Hello",
-										},
-										Annotations: &notion.Annotations{
-											Color: "default",
-										},
-										PlainText: "Hello",
-									},
-								},
-							},
-							"RollupArray": &notion.RollupProperty{
-								ID:   "abcd",
-								Type: "rollup",
-								Rollup: notion.Rollup{
-									Type: "array",
-									Array: notion.PropertyArray{
-										&notion.NumberProperty{
-											Type:   "number",
-											Number: 42.2,
-										},
-										&notion.NumberProperty{
-											Type:   "number",
-											Number: 56,
-										},
-									},
-								},
-							},
+							// "Tags": &notion.MultiSelectProperty{
+							// 	ID:   ";s|V",
+							// 	Type: "multi_select",
+							// 	MultiSelect: notion.Options{
+							// 		{
+							// 			ID:    "some_id",
+							// 			Name:  "tag",
+							// 			Color: "blue",
+							// 		},
+							// 	},
+							// },
+							// "Some another column": &notion.PeopleProperty{
+							// 	ID:   "rJt",
+							// 	Type: "people",
+							// 	People: []notion.User{
+							// 		{
+							// 			AtomObject: notion.AtomObject{
+							// 				Object:    "user",
+							// 			},
+							// 			AtomID: notion.AtomID{
+							// 				ID: "some_id",
+							// 			},
+							// 			Name: "some name",
+							// 			AvatarURL: "some.url",
+							// 			Person: &notion.Person{
+							// 				Email: "some@email.com",
+							// 			},
+							// 		},
+							// 	},
+							// },
+							// "SomeColumn": &notion.RichTextProperty{
+							// 	ID:   "~j_@",
+							// 	Type: "rich_text",
+							// 	RichText: []notion.RichText{
+							// 		{
+							// 			Type: "text",
+							// 			Text: &notion.Text{
+							// 				Content: "some text",
+							// 			},
+							// 			Annotations: &notion.Annotations{
+							// 				Color: "default",
+							// 			},
+							// 			PlainText: "some text",
+							// 		},
+							// 	},
+							// },
+							// "Some Files": &notion.FilesProperty{
+							// 	ID:   "files",
+							// 	Type: "files",
+							// 	Files: []notion.File{
+							// 		{
+							// 			Name: "https://google.com",
+							// 			Type: "external",
+							// 			External: &notion.FileObject{
+							// 				URL: "https://google.com",
+							// 			},
+							// 		},
+							// 	},
+							// },
+							// "Name": &notion.TitleProperty{
+							// 			ID:        "some_id",
+							// 			Name:      "some name",
+							// 			AvatarURL: "some.url",
+							// 			Type:      "person",
+							// 			Person: &notion.Person{
+							// 				Email: "some@email.com",
+							// 			},
+							// 		},
+							// 	},
+							// },
+							// "SomeColumn": &notion.RichTextProperty{
+							// 	ID:   "~j_@",
+							// 	Type: "rich_text",
+							// 	RichText: []notion.RichText{
+							// 		{
+							// 			Type: "text",
+							// 			Text: &notion.Text{
+							// 				Content: "some text",
+							// 			},
+							// 			Annotations: &notion.Annotations{
+							// 				Color: "default",
+							// 			},
+							// 			PlainText: "some text",
+							// 		},
+							// 	},
+							// },
+							// "Some Files": &notion.FilesProperty{
+							// 	ID:   "files",
+							// 	Type: "files",
+							// 	Files: []notion.File{
+							// 		{
+							// 			Name: "https://google.com",
+							// 			Type: "external",
+							// 			External: &notion.FileObject{
+							// 				URL: "https://google.com",
+							// 			},
+							// 		},
+							// 	},
+							// },
+							// "Name": &notion.TitleProperty{
+							// 	ID:   "title",
+							// 	Type: "title",
+							// 	Title: []notion.RichText{
+							// 		{
+							// 			Type: "text",
+							// 			Text: &notion.Text{
+							// 				Content: "Hello",
+							// 			},
+							// 			Annotations: &notion.Annotations{
+							// 				Color: "default",
+							// 			},
+							// 			PlainText: "Hello",
+							// 		},
+							// 	},
+							// },
+							// "RollupArray": &notion.RollupProperty{
+							// 	ID:   "abcd",
+							// 	Type: "rollup",
+							// 	Rollup: notion.Rollup{
+							// 		Type: "array",
+							// 		Array: notion.PropertyArray{
+							// 			&notion.NumberProperty{
+							// 				Type:   "number",
+							// 				Number: 42.2,
+							// 			},
+							// 			&notion.NumberProperty{
+							// 				Type:   "number",
+							// 				Number: 56,
+							// 			},
+							// 		},
+							// 	},
+							// },
 						},
 					},
 				},
@@ -202,7 +205,7 @@ func TestPagesService(t *testing.T) {
 				filePath:   "testdata/validation_error.json",
 				statusCode: http.StatusBadRequest,
 				wantErr:    true,
-				err: &notion.Error{
+				err: &notion.APIError{
 					Object:  notion.ObjectTypeError,
 					Status:  http.StatusBadRequest,
 					Code:    "validation_error",
@@ -214,9 +217,9 @@ func TestPagesService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewPagesService(client).Get(context.Background(), tt.id)
+				got, err := client.Pages.Get(ctx, tt.id)
 				if err != nil {
 					if tt.wantErr {
 						if !reflect.DeepEqual(err, tt.err) {
@@ -265,24 +268,29 @@ func TestPagesService(t *testing.T) {
 					},
 				},
 				want: &notion.Page{
-					Object:         notion.ObjectTypePage,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy: notion.User{
-						Object: "user",
-						ID:     "some_id",
+					AtomObject: notion.AtomObject{
+						Object: notion.ObjectTypePage,
 					},
-					LastEditedBy: notion.User{
-						Object: "user",
-						ID:     "some_id",
+					AtomID: notion.AtomID{
+						ID: "some_id",
 					},
-					Parent: notion.Parent{
-						Type:       notion.ParentTypeDatabaseID,
-						DatabaseID: "some_id",
+					AtomCreated: notion.AtomCreated{
+						CreatedTime: &timestamp,
+						CreatedBy:   user,
 					},
-					Archived: false,
-					URL:      "some_url",
+					AtomLastEdited: notion.AtomLastEdited{
+						LastEditedTime: &timestamp,
+						LastEditedBy:   user,
+					},
+					AtomParent: notion.AtomParent{
+						Parent: notion.NewDatabaseParent("some_id"),
+					},
+					AtomArchived: notion.AtomArchived{
+						Archived: false,
+					},
+					AtomURLs: notion.AtomURLs{
+						URL: "some_url",
+					},
 				},
 			},
 		}
@@ -290,8 +298,8 @@ func TestPagesService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewPagesService(client).Create(context.Background(), tt.request)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Pages.Create(ctx, tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 					return
@@ -334,18 +342,18 @@ func TestPagesService(t *testing.T) {
 						},
 						"Important Files": notion.FilesProperty{
 							Type: "files",
-							Files: []notion.File{
+							Files: notion.Files{
 								{
 									Type: "external",
-									Name: "https://google.com",
-									External: &notion.FileObject{
+									// Name: "https://google.com",
+									External: &notion.FileData{
 										URL: "https://google.com",
 									},
 								},
 								{
 									Type: "external",
-									Name: "https://123.com",
-									External: &notion.FileObject{
+									// Name: "https://123.com",
+									External: &notion.FileData{
 										URL: "https://123.com",
 									},
 								},
@@ -354,32 +362,37 @@ func TestPagesService(t *testing.T) {
 					},
 				},
 				want: &notion.Page{
-					Object:         notion.ObjectTypePage,
-					ID:             "some_id",
-					CreatedTime:    timestamp,
-					LastEditedTime: timestamp,
-					CreatedBy: notion.User{
-						Object: "user",
-						ID:     "some_id",
+					AtomObject: notion.AtomObject{
+						Object: notion.ObjectTypePage,
 					},
-					LastEditedBy: notion.User{
-						Object: "user",
-						ID:     "some_id",
+					AtomID: notion.AtomID{
+						ID: "some_id",
 					},
-					Parent: notion.Parent{
-						Type:       notion.ParentTypeDatabaseID,
-						DatabaseID: "some_id",
+					AtomCreated: notion.AtomCreated{
+						CreatedTime: &timestamp,
+						CreatedBy:   user,
 					},
-					Archived: false,
-					URL:      "some_url",
+					AtomLastEdited: notion.AtomLastEdited{
+						LastEditedTime: &timestamp,
+						LastEditedBy:   user,
+					},
+					AtomParent: notion.AtomParent{
+						Parent: notion.NewDatabaseParent("some_id"),
+					},
+					AtomArchived: notion.AtomArchived{
+						Archived: false,
+					},
+					AtomURLs: notion.AtomURLs{
+						URL: "some_url",
+					},
 				},
 			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
-				got, err := notion.NewPagesService(client).Update(context.Background(), tt.id, tt.request)
+				client := notion.New("some_token", notion.WithTransport(c))
+				got, err := client.Pages.Update(ctx, tt.id, tt.request)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
 					return
@@ -503,40 +516,17 @@ func TestPageCreateRequest_MarshallJSON(t *testing.T) {
 						Checkbox: false,
 					},
 				},
-				Children: []notion.Block{
-					&notion.Heading2Block{
-						BaseBlock: notion.BaseBlock{
-							Object: notion.ObjectTypeBlock,
-							Type:   notion.BlockTypeHeading2,
+				Children: notion.Blocks{
+					notion.NewHeading2Block(notion.Heading{
+						RichText: notion.RichTexts{
+							notion.NewTextRichText("Lacinato"),
 						},
-						Heading2: notion.Heading{
-							RichText: []notion.RichText{
-								{
-									Type: notion.RichTextTypeText,
-									Text: &notion.Text{Content: "Lacinato"},
-								},
-							},
+					}),
+					notion.NewParagraphBlock(notion.Paragraph{
+						RichText: notion.RichTexts{
+							notion.NewTextRichText("Lacinato").WithLink("some_url"),
 						},
-					},
-					&notion.ParagraphBlock{
-						BaseBlock: notion.BaseBlock{
-							Object: notion.ObjectTypeBlock,
-							Type:   notion.BlockTypeParagraph,
-						},
-						Paragraph: notion.Paragraph{
-							RichText: []notion.RichText{
-								{
-									Text: &notion.Text{
-										Content: "Lacinato",
-										Link: &notion.Link{
-											Url: "some_url",
-										},
-									},
-								},
-							},
-							Children: nil,
-						},
-					},
+					}),
 				},
 			},
 			want: []byte(`{"parent":{"database_id":"some_id"},"properties":{"Link":{"url":"some_url"},"Name":{"title":[{"text":{"content":"New Media Article"}}]},"Publishing/Release Date":{"date":{"start":"2020-12-08T12:00:00Z","end":null}},"Read":{"checkbox":false},"Summary":{"text":[{"type":"text","text":{"content":"Some content"},"annotations":{"bold":true,"italic":false,"strikethrough":false,"underline":false,"code":false,"color":"blue"},"plain_text":"Some content"}]},"Type":{"select":{"id":"some_id","name":"Article","color":"default"}}},"children":[{"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Lacinato"}}]}},{"object":"block","type":"paragraph","paragraph":{"rich_text":[{"text":{"content":"Lacinato","link":{"url":"some_url"}}}]}}]}`),

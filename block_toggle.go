@@ -1,20 +1,25 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#toggle-blocks
+
+// Toggle is a type for toggle blocks
 type Toggle struct {
 	AtomChildren
 	RichText RichTexts `json:"rich_text"`
 	Color    string    `json:"color,omitempty"`
 }
 
+// ToggleBlock is a Notion block for toggle blocks
 type ToggleBlock struct {
-	BaseBlock
+	BasicBlock
 	Toggle Toggle `json:"toggle"`
 }
 
+// NewToggleBlock creates a new ToggleBlock
 func NewToggleBlock(t Toggle) *ToggleBlock {
 	return &ToggleBlock{
-		BaseBlock: NewBaseBlock(BlockTypeToggle, t.ChildCount() > 0),
-		Toggle:    t,
+		BasicBlock: NewBasicBlock(BlockTypeToggle, t.ChildCount() > 0),
+		Toggle:     t,
 	}
 }
 
@@ -34,3 +39,7 @@ var (
 	_ Block             = (*ToggleBlock)(nil)
 	_ HierarchicalBlock = (*ToggleBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeToggle, func() Block { return &ToggleBlock{} })
+}

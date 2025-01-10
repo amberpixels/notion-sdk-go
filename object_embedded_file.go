@@ -20,6 +20,7 @@ type File struct {
 	File     *FileData `json:"file,omitempty"`
 	External *FileData `json:"external,omitempty"`
 }
+type Files []File
 
 // FileData is a file Data object
 type FileData struct {

@@ -12,6 +12,8 @@ import (
 )
 
 func TestAuthenticationService(t *testing.T) {
+	ctx := context.Background()
+
 	t.Run("CreateToken", func(t *testing.T) {
 		tests := []struct {
 			name       string
@@ -60,10 +62,10 @@ func TestAuthenticationService(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				// Mock client
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
 				// Call method under test
-				got, gotErr := notion.NewAuthenticationService(client).CreateToken(context.Background(), tt.request)
+				got, gotErr := client.Auth.CreateToken(ctx, tt.request)
 
 				// Assertions
 				if tt.wantErr != nil {

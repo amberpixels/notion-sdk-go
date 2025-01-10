@@ -1,20 +1,25 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#paragraph
+
+// Paragraph is a type for paragraph blocks
 type Paragraph struct {
 	AtomChildren
 	RichText RichTexts `json:"rich_text"`
-	Color    string    `json:"color,omitempty"`
+	Color    Color     `json:"color,omitempty"`
 }
 
+// ParagraphBlock is a Notion block for paragraph blocks
 type ParagraphBlock struct {
-	BaseBlock
+	BasicBlock
 	Paragraph Paragraph `json:"paragraph"`
 }
 
+// NewParagraphBlock creates a new ParagraphBlock
 func NewParagraphBlock(p Paragraph) *ParagraphBlock {
 	return &ParagraphBlock{
-		BaseBlock: NewBaseBlock(BlockTypeParagraph, p.ChildCount() > 0),
-		Paragraph: p,
+		BasicBlock: NewBasicBlock(BlockTypeParagraph, p.ChildCount() > 0),
+		Paragraph:  p,
 	}
 }
 
@@ -34,3 +39,7 @@ var (
 	_ Block             = (*ParagraphBlock)(nil)
 	_ HierarchicalBlock = (*ParagraphBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeParagraph, func() Block { return &ParagraphBlock{} })
+}

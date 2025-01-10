@@ -1,21 +1,28 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#template
+// Note:
+// 	As of March 27, 2023 creation of template blocks will no longer be supported.
+
+// Template is a type for template blocks
 type Template struct {
 	AtomChildren
 	RichText RichTexts `json:"rich_text"`
 }
 
 // Deprecated
+// TemplateBlock is a Notion block for template blocks
 type TemplateBlock struct {
-	BaseBlock
+	BasicBlock
 	Template Template `json:"template"`
 }
 
 // Deprecated
+// NewTemplateBlock creates a new TemplateBlock
 func NewTemplateBlock(t Template) *TemplateBlock {
 	return &TemplateBlock{
-		BaseBlock: NewBaseBlock(BlockTypeTemplate, t.ChildCount() > 0),
-		Template:  t,
+		BasicBlock: NewBasicBlock(BlockTypeTemplate, t.ChildCount() > 0),
+		Template:   t,
 	}
 }
 
@@ -35,3 +42,7 @@ var (
 	_ Block             = (*TemplateBlock)(nil)
 	_ HierarchicalBlock = (*TemplateBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeTemplate, func() Block { return &TemplateBlock{} })
+}

@@ -13,8 +13,8 @@ type SearchService struct {
 	api *clientAPI
 }
 
-// NewSearchService creates an instance of SearchService.
-func NewSearchService(api *clientAPI) *SearchService {
+// newSearchService creates an instance of SearchService.
+func newSearchService(api *clientAPI) *SearchService {
 	return &SearchService{api: api}
 }
 

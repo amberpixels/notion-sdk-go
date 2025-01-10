@@ -13,6 +13,8 @@ import (
 )
 
 func TestCommentsService(t *testing.T) {
+	ctx := context.Background()
+
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
 	require.NoError(t, err)
 
@@ -94,9 +96,9 @@ func TestCommentsService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewCommentsService(client).Get(context.Background(), tt.id, nil)
+				got, err := client.Comments.Get(ctx, tt.id, nil)
 
 				if tt.wantErr {
 					assert.Error(t, err)
@@ -160,9 +162,9 @@ func TestCommentsService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewCommentsService(client).Create(context.Background(), tt.request)
+				got, err := client.Comments.Create(ctx, tt.request)
 
 				if tt.wantErr {
 					assert.Error(t, err)

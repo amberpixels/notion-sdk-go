@@ -17,8 +17,8 @@ type BlocksService struct {
 	api *clientAPI
 }
 
-// NewBlocksService creates an instance BlocksService.
-func NewBlocksService(api *clientAPI) *BlocksService {
+// newBlocksService creates an instance BlocksService.
+func newBlocksService(api *clientAPI) *BlocksService {
 	return &BlocksService{api: api}
 }
 

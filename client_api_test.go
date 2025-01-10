@@ -44,13 +44,13 @@ func TestRateLimit(t *testing.T) {
 				Header:     http.Header{"Retry-After": []string{"0"}},
 			}
 		})
-		client := notion.NewClientAPI(
+		client := notion.New(
 			"some_token",
 			notion.WithTransport(transport),
 			notion.WithRetry(2),
 		)
 
-		_, err := notion.NewBlocksService(client).Get(context.Background(), "some_block_id")
+		_, err := client.Blocks.Get(context.Background(), "some_block_id")
 
 		assert.Error(t, err, "expected error due to rate limit")
 		assert.EqualError(t, err, "Retry request with 429 response failed after 2 retries")
@@ -66,12 +66,12 @@ func TestRateLimit(t *testing.T) {
 				Header:     http.Header{"Retry-After": []string{"0"}},
 			}
 		})
-		client := notion.NewClientAPI("some_token",
+		client := notion.New("some_token",
 			notion.WithTransport(transport),
 			notion.WithRetry(maxRetries),
 		)
 
-		_, err := notion.NewBlocksService(client).Get(context.Background(), "some_block_id")
+		_, err := client.Blocks.Get(context.Background(), "some_block_id")
 
 		assert.Error(t, err, "expected error due to rate limit")
 		assert.Equal(t, maxRetries, attempts, "number of retries should match maxRetries")
@@ -98,12 +98,12 @@ func TestBasicAuthHeader(t *testing.T) {
 		return resp
 	})
 
-	opts := []notion.ClientAPIOption{
+	opts := []notion.ClientOpt{
 		notion.WithTransport(transport),
 		notion.WithOAuthAppCredentials("my id here", "secret shhh"),
 	}
-	client := notion.NewClientAPI("some_token", opts...)
+	client := notion.New("some_token", opts...)
 
-	_, err = notion.NewAuthenticationService(client).CreateToken(context.Background(), &notion.TokenCreateRequest{})
+	_, err = client.Auth.CreateToken(context.Background(), &notion.TokenCreateRequest{})
 	assert.NoError(t, err, "unexpected error during token creation")
 }

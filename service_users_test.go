@@ -12,6 +12,8 @@ import (
 )
 
 func TestUsersService(t *testing.T) {
+	ctx := context.Background()
+
 	t.Run("Get", func(t *testing.T) {
 		tests := []struct {
 			name       string
@@ -44,9 +46,9 @@ func TestUsersService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewUsersService(client).Get(context.Background(), tt.id)
+				got, err := client.Users.Get(ctx, tt.id)
 				if tt.wantErr {
 					assert.Error(t, err)
 				} else {
@@ -104,9 +106,9 @@ func TestUsersService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewUsersService(client).List(context.Background(), nil)
+				got, err := client.Users.List(ctx, nil)
 				if tt.wantErr {
 					assert.Error(t, err)
 				} else {
@@ -150,9 +152,9 @@ func TestUsersService(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
-				client := notion.NewClient("some_token", notion.WithHTTPClient(c))
+				client := notion.New("some_token", notion.WithTransport(c))
 
-				got, err := notion.NewUsersService(client).Me(context.Background())
+				got, err := client.Users.Me(ctx)
 				if tt.wantErr {
 					assert.Error(t, err)
 				} else {

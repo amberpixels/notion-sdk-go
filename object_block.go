@@ -89,6 +89,14 @@ type HierarchicalBlock interface {
 	ChildCount() int
 }
 
+// BasicBlock is a block that can handle its GetBasicBlock
+// It's not supposed to be widely used, but it's useful for testing,
+// and other tasks where you need reflect-type Block access
+type BasicBlockHolder interface {
+	GetBasicBlock() BasicBlock
+	SetBasicBlock(BasicBlock) Block
+}
+
 // Blocks is a slice of (generic) Block objects.
 type Blocks []Block
 
@@ -113,10 +121,10 @@ func (b *Blocks) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// BaseBlock defines the common fields of all Notion block types.
+// BasicBlock defines the common fields of all Notion block types.
 // See https://developers.notion.com/reference/block for the list.
-// BaseBlock implements the Block interface.
-type BaseBlock struct {
+// BasicBlock implements the Block interface.
+type BasicBlock struct {
 	AtomID
 	AtomParent
 	AtomObject
@@ -132,15 +140,15 @@ type BaseBlock struct {
 	HasChildren bool      `json:"has_children,omitempty"`
 }
 
-// NewBaseBlock returns a new BaseBlock with the ObjectTypeBlock and given block type.
+// NewBasicBlock returns a new BasicBlock with the ObjectTypeBlock and given block type.
 // It's used as a basic block for all other blocks.
-func NewBaseBlock(blockType BlockType, hasChildrenArg ...bool) BaseBlock {
+func NewBasicBlock(blockType BlockType, hasChildrenArg ...bool) BasicBlock {
 	var hasChildren bool
 	if len(hasChildrenArg) > 0 {
 		hasChildren = hasChildrenArg[0]
 	}
 
-	return BaseBlock{
+	return BasicBlock{
 		AtomObject: AtomObject{
 			Object: ObjectTypeBlock,
 		},
@@ -149,52 +157,24 @@ func NewBaseBlock(blockType BlockType, hasChildrenArg ...bool) BaseBlock {
 	}
 }
 
-func (b BaseBlock) GetType() BlockType    { return b.Type }
-func (b BaseBlock) GetObject() ObjectType { return ObjectTypeBlock }
-func (b BaseBlock) GetHasChildren() bool  { return b.HasChildren }
+func (b BasicBlock) GetType() BlockType    { return b.Type }
+func (b BasicBlock) GetObject() ObjectType { return ObjectTypeBlock }
+func (b BasicBlock) GetHasChildren() bool  { return b.HasChildren }
 
-var _ Block = (*BaseBlock)(nil)
-var _ HierarchicalBlock = (*BaseBlock)(nil)
+var _ Block = (*BasicBlock)(nil)
+var _ HierarchicalBlock = (*BasicBlock)(nil)
 
-var _ Block = (*BaseBlock)(nil)
+var _ Block = (*BasicBlock)(nil)
+
+// Note: we do not care about the order of registration and obout concurrency
+// TODO do we?
+var blockConstructors = map[BlockType]func() Block{}
+
+func registerBlockDecoder(blockType BlockType, blockConstructor func() Block) {
+	blockConstructors[blockType] = blockConstructor
+}
 
 func decodeBlock(raw map[string]any) (Block, error) {
-	blockConstructors := map[BlockType]func() Block{
-		BlockTypeParagraph:        func() Block { return &ParagraphBlock{} },
-		BlockTypeHeading1:         func() Block { return &Heading1Block{} },
-		BlockTypeHeading2:         func() Block { return &Heading2Block{} },
-		BlockTypeHeading3:         func() Block { return &Heading3Block{} },
-		BlockTypeCallout:          func() Block { return &CalloutBlock{} },
-		BlockTypeQuote:            func() Block { return &QuoteBlock{} },
-		BlockTypeBulletedListItem: func() Block { return &BulletedListItemBlock{} },
-		BlockTypeNumberedListItem: func() Block { return &NumberedListItemBlock{} },
-		BlockTypeToDo:             func() Block { return &ToDoBlock{} },
-		BlockTypeCode:             func() Block { return &CodeBlock{} },
-		BlockTypeToggle:           func() Block { return &ToggleBlock{} },
-		BlockTypeChildPage:        func() Block { return &ChildPageBlock{} },
-		BlockTypeEmbed:            func() Block { return &EmbedBlock{} },
-		BlockTypeImage:            func() Block { return &ImageBlock{} },
-		BlockTypeAudio:            func() Block { return &AudioBlock{} },
-		BlockTypeVideo:            func() Block { return &VideoBlock{} },
-		BlockTypeFile:             func() Block { return &FileBlock{} },
-		BlockTypePdf:              func() Block { return &PdfBlock{} },
-		BlockTypeBookmark:         func() Block { return &BookmarkBlock{} },
-		BlockTypeChildDatabase:    func() Block { return &ChildDatabaseBlock{} },
-		BlockTypeTableOfContents:  func() Block { return &TableOfContentsBlock{} },
-		BlockTypeDivider:          func() Block { return &DividerBlock{} },
-		BlockTypeEquation:         func() Block { return &EquationBlock{} },
-		BlockTypeBreadcrumb:       func() Block { return &BreadcrumbBlock{} },
-		BlockTypeColumn:           func() Block { return &ColumnBlock{} },
-		BlockTypeColumnList:       func() Block { return &ColumnListBlock{} },
-		BlockTypeLinkPreview:      func() Block { return &LinkPreviewBlock{} },
-		BlockTypeLinkToPage:       func() Block { return &LinkToPageBlock{} },
-		BlockTypeTemplate:         func() Block { return &TemplateBlock{} },
-		BlockTypeSyncedBlock:      func() Block { return &SyncedBlock{} },
-		BlockTypeTable:            func() Block { return &TableBlock{} },
-		BlockTypeTableRow:         func() Block { return &TableRowBlock{} },
-		BlockTypeUnsupported:      func() Block { return &UnsupportedBlock{} },
-	}
-
 	blockType, ok := raw["type"].(string)
 	if !ok {
 		return nil, fmt.Errorf("invalid block type")

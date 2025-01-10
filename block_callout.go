@@ -1,22 +1,27 @@
 package notion
 
+// Reference: https://developers.notion.com/reference/block#callout
+
+// Callout is a block that represents a callout (icon + color + rich text).
 type Callout struct {
 	AtomChildren
 
 	RichText RichTexts `json:"rich_text"`
 	Icon     *Icon     `json:"icon,omitempty"`
-	Color    string    `json:"color,omitempty"`
+	Color    Color     `json:"color,omitempty"`
 }
 
+// CalloutBlock is a Notion block for a callout.
 type CalloutBlock struct {
-	BaseBlock
+	BasicBlock
 	Callout Callout `json:"callout"`
 }
 
-func NewCalloutBlock(callout Callout) *CalloutBlock {
+// NewCalloutBlock creates a new CalloutBlock.
+func NewCalloutBlock(c Callout) *CalloutBlock {
 	return &CalloutBlock{
-		BaseBlock: NewBaseBlock(BlockTypeCallout, callout.ChildCount() > 0),
-		Callout:   callout,
+		BasicBlock: NewBasicBlock(BlockTypeCallout, c.ChildCount() > 0),
+		Callout:    c,
 	}
 }
 
@@ -36,3 +41,7 @@ var (
 	_ Block             = (*CalloutBlock)(nil)
 	_ HierarchicalBlock = (*CalloutBlock)(nil)
 )
+
+func init() {
+	registerBlockDecoder(BlockTypeCallout, func() Block { return &CalloutBlock{} })
+}

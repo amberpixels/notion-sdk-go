@@ -1,7 +1,11 @@
 package notion
 
+// Appearance is an interface for Blocks that can have an icon and/or a cover.
 type Appearance interface {
+	// GetIcon returns the Icon of the Appearance.
 	GetIcon() *Icon
+
+	// GetCover returns the Cover of the Appearance.
 	GetCover() *File
 }
 
@@ -11,7 +15,10 @@ type AtomAppearance struct {
 	Cover *File `json:"cover,omitempty"`
 }
 
-func (a AtomAppearance) GetIcon() *Icon  { return a.Icon }
+// GetIcon returns the Icon of the AtomAppearance.
+func (a AtomAppearance) GetIcon() *Icon { return a.Icon }
+
+// GetCover returns the Cover of the AtomAppearance.
 func (a AtomAppearance) GetCover() *File { return a.Cover }
 
 var _ Appearance = (*AtomAppearance)(nil)

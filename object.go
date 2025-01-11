@@ -14,6 +14,7 @@ type ObjectType string
 // String returns the string representation of the ObjectType.
 func (ot ObjectType) String() string { return string(ot) }
 
+// nolint:revive
 const (
 	ObjectTypeDatabase ObjectType = "database"
 	ObjectTypeBlock    ObjectType = "block"

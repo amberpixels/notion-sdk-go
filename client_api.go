@@ -24,9 +24,9 @@ const (
 	maxRetries           = 3
 )
 
-type errJsonDecodeFunc func(data []byte) error
+type errJSONDecodeFunc func(data []byte) error
 
-// Client is a Notion API client.
+// clientAPI is an internal-use Notion API Client.
 type clientAPI struct {
 	apiVersion    string
 	notionVersion string
@@ -38,7 +38,7 @@ type clientAPI struct {
 
 	maxRetries int
 
-	errDecoder errJsonDecodeFunc
+	errDecoder errJSONDecodeFunc
 
 	// used in Authorization header only for requests that require Basic authentication.
 	oauthID     string
@@ -75,7 +75,7 @@ func (c *clientAPI) request(ctx context.Context, method string, path string, par
 	return c.requestRaw(ctx, method, path, params, payload, false, c.errDecoder)
 }
 
-func (c *clientAPI) requestRaw(ctx context.Context, method string, path string, params map[string]string, payload any, basicAuth bool, customErrDecoder errJsonDecodeFunc) (*http.Response, error) {
+func (c *clientAPI) requestRaw(ctx context.Context, method string, path string, params map[string]string, payload any, basicAuth bool, customErrDecoder errJSONDecodeFunc) (*http.Response, error) {
 	u, err := c.parsedBaseURL.Parse(fmt.Sprintf("%s/%s", c.apiVersion, path))
 	if err != nil {
 		return nil, err

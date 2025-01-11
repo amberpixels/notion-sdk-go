@@ -9,6 +9,7 @@ type MentionType string
 // String returns the string representation of the MentionType
 func (v MentionType) String() string { return string(v) }
 
+// nolint:revive
 const (
 	MentionTypeDatabase        MentionType = "database"
 	MentionTypePage            MentionType = "page"
@@ -50,6 +51,7 @@ type TemplateMentionType string
 // String returns the string representation of the TemplateMentionType
 func (t TemplateMentionType) String() string { return string(t) }
 
+// nolint:revive
 const (
 	TemplateMentionTypeUser TemplateMentionType = "template_mention_user"
 	TemplateMentionTypeDate TemplateMentionType = "template_mention_date"

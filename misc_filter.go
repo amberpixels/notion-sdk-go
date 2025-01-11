@@ -4,25 +4,34 @@ import (
 	"encoding/json"
 )
 
+// FilterOperator is a type for filter operators.
 type FilterOperator string
 
+// nolint:revive
 const (
 	FilterOperatorAND FilterOperator = "and"
 	FilterOperatorOR  FilterOperator = "or"
 )
 
+// Filter is an interface for filter types.
+// TODO: refactor probably
 type Filter interface {
 	filter()
 }
 
+// CompoundFilter is a type for compound filters.
 type CompoundFilter map[FilterOperator][]PropertyFilter
 
+// AndCompoundFilter is a type for `and` compound filters.
 type AndCompoundFilter []Filter
+
+// OrCompoundFilter is a type for `or` compound filters.
 type OrCompoundFilter []Filter
 
 func (f AndCompoundFilter) filter() {}
 func (f OrCompoundFilter) filter()  {}
 
+// MarshalJSON implements custom marshalling for AndCompoundFilter and OrCompoundFilter
 func (f AndCompoundFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		And []Filter `json:"and"`
@@ -31,6 +40,7 @@ func (f AndCompoundFilter) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// MarshalJSON implements custom marshalling for OrCompoundFilter
 func (f OrCompoundFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Or []Filter `json:"or"`
@@ -39,8 +49,10 @@ func (f OrCompoundFilter) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// Condition is a type for filter conditions.
 type Condition string
 
+// nolint:revive
 const (
 	ConditionEquals         Condition = "equals"
 	ConditionDoesNotEqual   Condition = "does_not_equal"
@@ -72,6 +84,7 @@ const (
 	ConditionDate     Condition = "date"
 )
 
+// TimestampFilter is a type for timestamp filters.
 type TimestampFilter struct {
 	Timestamp      TimestampType        `json:"timestamp"`
 	CreatedTime    *DateFilterCondition `json:"created_time,omitempty"`
@@ -80,6 +93,7 @@ type TimestampFilter struct {
 
 func (f TimestampFilter) filter() {}
 
+// PropertyFilter is a type for property filters.
 type PropertyFilter struct {
 	Property    string                      `json:"property"`
 	RichText    *TextFilterCondition        `json:"rich_text,omitempty"`
@@ -94,16 +108,18 @@ type PropertyFilter struct {
 	Formula     *FormulaFilterCondition     `json:"formula,omitempty"`
 	Rollup      *RollupFilterCondition      `json:"rollup,omitempty"`
 	Status      *StatusFilterCondition      `json:"status,omitempty"`
-	UniqueId    *UniqueIdFilterCondition    `json:"unique_id,omitempty"`
+	UniqueID    *UniqueIDFilterCondition    `json:"unique_id,omitempty"`
 }
 
 func (f PropertyFilter) filter() {}
 
+// SearchFilter is a type for search filters.
 type SearchFilter struct {
 	Value    string `json:"value"`
 	Property string `json:"property"`
 }
 
+// TextFilterCondition is a type for text filter conditions.
 type TextFilterCondition struct {
 	Equals         string `json:"equals,omitempty"`
 	DoesNotEqual   string `json:"does_not_equal,omitempty"`
@@ -115,6 +131,7 @@ type TextFilterCondition struct {
 	IsNotEmpty     bool   `json:"is_not_empty,omitempty"`
 }
 
+// NumberFilterCondition is a type for number filter conditions.
 type NumberFilterCondition struct {
 	Equals               *float64 `json:"equals,omitempty"`
 	DoesNotEqual         *float64 `json:"does_not_equal,omitempty"`
@@ -126,11 +143,13 @@ type NumberFilterCondition struct {
 	IsNotEmpty           bool     `json:"is_not_empty,omitempty"`
 }
 
+// CheckboxFilterCondition is a type for checkbox filter conditions.
 type CheckboxFilterCondition struct {
 	Equals       bool `json:"equals,omitempty"`
 	DoesNotEqual bool `json:"does_not_equal,omitempty"`
 }
 
+// SelectFilterCondition is a type for select filter conditions.
 type SelectFilterCondition struct {
 	Equals       string `json:"equals,omitempty"`
 	DoesNotEqual string `json:"does_not_equal,omitempty"`
@@ -138,6 +157,7 @@ type SelectFilterCondition struct {
 	IsNotEmpty   bool   `json:"is_not_empty,omitempty"`
 }
 
+// MultiSelectFilterCondition is a type for multi-select filter conditions.
 type MultiSelectFilterCondition struct {
 	Contains       string `json:"contains,omitempty"`
 	DoesNotContain string `json:"does_not_contain,omitempty"`
@@ -145,6 +165,7 @@ type MultiSelectFilterCondition struct {
 	IsNotEmpty     bool   `json:"is_not_empty,omitempty"`
 }
 
+// DateFilterCondition is a type for date
 type DateFilterCondition struct {
 	Equals     *Date     `json:"equals,omitempty"`
 	Before     *Date     `json:"before,omitempty"`
@@ -161,6 +182,7 @@ type DateFilterCondition struct {
 	IsNotEmpty bool      `json:"is_not_empty,omitempty"`
 }
 
+// PeopleFilterCondition is a type for people filter conditions.
 type PeopleFilterCondition struct {
 	Contains       string `json:"contains,omitempty"`
 	DoesNotContain string `json:"does_not_contain,omitempty"`
@@ -168,11 +190,13 @@ type PeopleFilterCondition struct {
 	IsNotEmpty     bool   `json:"is_not_empty,omitempty"`
 }
 
+// FilesFilterCondition is a type for files filter conditions.
 type FilesFilterCondition struct {
 	IsEmpty    bool `json:"is_empty,omitempty"`
 	IsNotEmpty bool `json:"is_not_empty,omitempty"`
 }
 
+// RelationFilterCondition is a type for relation filter conditions.
 type RelationFilterCondition struct {
 	Contains       string `json:"contains,omitempty"`
 	DoesNotContain string `json:"does_not_contain,omitempty"`
@@ -180,6 +204,7 @@ type RelationFilterCondition struct {
 	IsNotEmpty     bool   `json:"is_not_empty,omitempty"`
 }
 
+// FormulaFilterCondition is a type for formula filter conditions.
 type FormulaFilterCondition struct {
 	// DEPRECATED use `String` instead
 	Text     *TextFilterCondition     `json:"text,omitempty"`
@@ -189,6 +214,7 @@ type FormulaFilterCondition struct {
 	Date     *DateFilterCondition     `json:"date,omitempty"`
 }
 
+// RollupFilterCondition is a type for rollup filter conditions.
 type RollupFilterCondition struct {
 	Any    *RollupSubfilterCondition `json:"any,omitempty"`
 	None   *RollupSubfilterCondition `json:"none,omitempty"`
@@ -197,6 +223,7 @@ type RollupFilterCondition struct {
 	Number *NumberFilterCondition    `json:"number,omitempty"`
 }
 
+// RollupSubfilterCondition is a type for rollup subfilter conditions.
 type RollupSubfilterCondition struct {
 	RichText    *TextFilterCondition        `json:"rich_text,omitempty"`
 	Number      *NumberFilterCondition      `json:"number,omitempty"`
@@ -209,6 +236,7 @@ type RollupSubfilterCondition struct {
 	Files       *FilesFilterCondition       `json:"files,omitempty"`
 }
 
+// StatusFilterCondition is a type for status filter conditions.
 type StatusFilterCondition struct {
 	Equals       string `json:"equals,omitempty"`
 	DoesNotEqual string `json:"does_not_equal,omitempty"`
@@ -216,7 +244,8 @@ type StatusFilterCondition struct {
 	IsNotEmpty   bool   `json:"is_not_empty,omitempty"`
 }
 
-type UniqueIdFilterCondition struct {
+// UniqueIDFilterCondition is a type for unique ID filter conditions.
+type UniqueIDFilterCondition struct {
 	Equals               *int `json:"equals,omitempty"`
 	DoesNotEqual         *int `json:"does_not_equal,omitempty"`
 	GreaterThan          *int `json:"greater_than,omitempty"`

@@ -11,7 +11,7 @@ func (c Cursor) String() string { return string(c) }
 // EmptyCursor is a constant for empty cursor.
 const EmptyCursor = ""
 
-// AtomPaginatedResponse is embeded in all paginated responses.
+// AtomPaginatedResponse is embedded in all paginated responses.
 type AtomPaginatedResponse struct {
 	Object     ObjectType `json:"object"`
 	NextCursor Cursor     `json:"next_cursor"`

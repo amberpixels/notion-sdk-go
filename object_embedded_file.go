@@ -6,6 +6,7 @@ import "time"
 // See https://developers.notion.com/reference/file-object
 type FileType string
 
+// nolint:revive
 const (
 	FileTypeFile     FileType = "file"
 	FileTypeExternal FileType = "external"
@@ -20,6 +21,8 @@ type File struct {
 	File     *FileData `json:"file,omitempty"`
 	External *FileData `json:"external,omitempty"`
 }
+
+// Files is a slice of File objects.
 type Files []File
 
 // FileData is a file Data object
@@ -28,6 +31,7 @@ type FileData struct {
 	ExpiryTime *time.Time `json:"expiry_time,omitempty"`
 }
 
+// GetURL returns the URL of the File.
 func (f File) GetURL() string {
 	if f.File != nil {
 		return f.File.URL
@@ -38,6 +42,7 @@ func (f File) GetURL() string {
 	return ""
 }
 
+// GetExpiryTime returns the ExpiryTime of the File.
 func (f File) GetExpiryTime() *time.Time {
 	if f.File != nil {
 		return f.File.ExpiryTime

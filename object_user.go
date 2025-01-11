@@ -7,6 +7,7 @@ type UserID = ObjectID
 // UserType stands for Type of User object.
 type UserType string
 
+// nolint:revive
 const (
 	UserTypePerson UserType = "person"
 	UserTypeBot    UserType = "bot"

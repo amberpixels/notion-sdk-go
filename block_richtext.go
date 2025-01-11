@@ -9,6 +9,7 @@ type RichTextType string
 // String returns the string representation of the RichTextType
 func (t RichTextType) String() string { return string(t) }
 
+// nolint:revive
 const (
 	RichTextTypeText     RichTextType = "text"
 	RichTextTypeMention  RichTextType = "mention"
@@ -47,7 +48,7 @@ type Annotations struct {
 // WithLink makes a new RichText with a link to the given destination
 func (rt RichText) WithLink(destination string) RichText {
 	if rt.Text != nil {
-		rt.Text.Link = &Link{Url: destination}
+		rt.Text.Link = &Link{URL: destination}
 		rt.Href = destination
 	}
 

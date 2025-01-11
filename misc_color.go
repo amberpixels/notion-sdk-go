@@ -6,6 +6,7 @@ type Color string
 // String returns the string representation of the Color.
 func (c Color) String() string { return string(c) }
 
+// nolint:revive
 const (
 	ColorDefault           Color = "default"
 	ColorGray              Color = "gray"

@@ -10,7 +10,7 @@ type Text struct {
 
 // Link is a link object to be used in RichText.Text.Link
 type Link struct {
-	Url string `json:"url,omitempty"`
+	URL string `json:"url,omitempty"`
 }
 
 // NewTextRichText creates a new RichText with the given text
@@ -33,7 +33,7 @@ func NewLinkRichText(content, link string) RichText {
 		Text: &Text{
 			Content: content,
 			Link: &Link{
-				Url: link,
+				URL: link,
 			},
 		},
 		PlainText: content,

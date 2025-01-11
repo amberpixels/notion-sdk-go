@@ -30,14 +30,14 @@ func TestAuthenticationService(t *testing.T) {
 				request: &notion.TokenCreateRequest{
 					Code:        "code1",
 					GrantType:   "authorization_code",
-					RedirectUri: "www.example.com",
+					RedirectURI: "www.example.com",
 				},
 				want: &notion.TokenCreateResponse{
 					AccessToken:          "token1",
-					BotId:                "bot1",
-					DuplicatedTemplateId: "template_id1",
+					BotID:                "bot1",
+					DuplicatedTemplateID: "template_id1",
 					WorkspaceIcon:        "🎉",
-					WorkspaceId:          "workspaceid_1",
+					WorkspaceID:          "workspaceid_1",
 					WorkspaceName:        "workspace_1",
 				},
 				wantErr: nil,
@@ -49,7 +49,7 @@ func TestAuthenticationService(t *testing.T) {
 				request: &notion.TokenCreateRequest{
 					Code:        "code1",
 					GrantType:   "authorization_code",
-					RedirectUri: "www.example.com",
+					RedirectURI: "www.example.com",
 				},
 				wantErr: &notion.TokenCreateError{
 					Code:    "invalid_grant",

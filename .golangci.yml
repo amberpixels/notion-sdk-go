@@ -16,6 +16,7 @@ linters:
     - misspell
     - gofmt
     - gosec
+    - revive
 
 issues:
   exclude-use-default: false
@@ -24,4 +25,5 @@ issues:
   exclude-rules:
     - linters:
         - gosec
+        - unused
       path: _test.go

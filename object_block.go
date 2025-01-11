@@ -16,6 +16,7 @@ type BlockType string
 func (bt BlockType) String() string { return string(bt) }
 
 // See https://developers.notion.com/reference/block
+// nolint:revive
 const (
 	BlockTypeParagraph BlockType = "paragraph"
 	BlockTypeHeading1  BlockType = "heading_1"
@@ -55,6 +56,7 @@ const (
 )
 
 const (
+	// BlockTypeTemplate is a block type for template blocks.
 	// Deprecated
 	// See https://developers.notion.com/reference/block#template
 	BlockTypeTemplate BlockType = "template"
@@ -89,7 +91,7 @@ type HierarchicalBlock interface {
 	ChildCount() int
 }
 
-// BasicBlock is a block that can handle its GetBasicBlock
+// BasicBlockHolder is a block that can handle its GetBasicBlock
 // It's not supposed to be widely used, but it's useful for testing,
 // and other tasks where you need reflect-type Block access
 type BasicBlockHolder interface {
@@ -157,9 +159,14 @@ func NewBasicBlock(blockType BlockType, hasChildrenArg ...bool) BasicBlock {
 	}
 }
 
-func (b BasicBlock) GetType() BlockType    { return b.Type }
+// GetType returns the Type of the BasicBlock.
+func (b BasicBlock) GetType() BlockType { return b.Type }
+
+// GetObject returns the ObjectType of the BasicBlock. Always returns ObjectTypeBlock.
 func (b BasicBlock) GetObject() ObjectType { return ObjectTypeBlock }
-func (b BasicBlock) GetHasChildren() bool  { return b.HasChildren }
+
+// GetHasChildren returns the HasChildren of the BasicBlock.
+func (b BasicBlock) GetHasChildren() bool { return b.HasChildren }
 
 var _ Block = (*BasicBlock)(nil)
 var _ HierarchicalBlock = (*BasicBlock)(nil)

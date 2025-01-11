@@ -4,6 +4,7 @@ package notion
 // See https://developers.notion.com/reference/parent-object
 type ParentType string
 
+// nolint:revive
 const (
 	ParentTypeDatabaseID ParentType = "database_id"
 	ParentTypePageID     ParentType = "page_id"
@@ -11,6 +12,7 @@ const (
 	ParentTypeWorkspace  ParentType = "workspace"
 )
 
+// Parent is a type for Notion's Parent object:
 // Pages, databases, and blocks are either located inside other pages,
 // databases, and blocks, or are located at the top level of a workspace. This
 // location is known as the "parent". Parent information is represented by a

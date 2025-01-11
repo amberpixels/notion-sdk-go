@@ -71,7 +71,7 @@ func (s *BlocksService) GetChildren(ctx context.Context, id BlockID, pagination 
 	return response, nil
 }
 
-// Appendchildren creates and appends new children blocks to the parent block_id specified.
+// AppendChildren creates and appends new children blocks to the parent block_id specified.
 // Blocks can be parented by other blocks, pages, or databases.
 //
 // Returns a paginated list of newly created first level children block objects.
@@ -197,6 +197,7 @@ type BlockUpdateRequest struct {
 	TableRow         *TableRow  `json:"table_row,omitempty"`
 }
 
+// AppendBlockChildrenResponse is a type for append block children response.
 type AppendBlockChildrenResponse struct {
 	Object  ObjectType `json:"object"`
 	Results []Block    `json:"results"`

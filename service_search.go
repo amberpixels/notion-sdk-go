@@ -73,7 +73,7 @@ type SearchRequest struct {
 	PageSize int `json:"page_size,omitempty"`
 }
 
-// SearchResponse
+// SearchResponse is a type for search response.
 type SearchResponse struct {
 	AtomPaginatedResponse
 	Results Objects `json:"results"`

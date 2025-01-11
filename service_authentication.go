@@ -62,7 +62,7 @@ type TokenCreateRequest struct {
 	// the integration's Authorization settings. Do not include this field if a
 	// "redirect_uri" query param was not included in the Authorization URL
 	// provided to users. In most cases, this field is required.
-	RedirectUri string `json:"redirect_uri,omitempty"`
+	RedirectURI string `json:"redirect_uri,omitempty"`
 	// Required if and only when building Link Preview integrations (otherwise
 	// ignored). An object with key and name properties. key should be a unique
 	// identifier for the account. Notion uses the key to determine whether or not
@@ -83,13 +83,13 @@ type ExternalAccount struct {
 // TokenCreateResponse is a type for token create response.
 type TokenCreateResponse struct {
 	AccessToken          string `json:"access_token"`
-	BotId                string `json:"bot_id"`
-	DuplicatedTemplateId string `json:"duplicated_template_id,omitempty"`
+	BotID                string `json:"bot_id"`
+	DuplicatedTemplateID string `json:"duplicated_template_id,omitempty"`
 
 	// Owner can be { "workspace": true } OR a User object.
 	// Ref: https://developers.notion.com/docs/authorization#step-4-notion-responds-with-an-access_token-and-some-additional-information
 	Owner         any    `json:"owner,omitempty"`
 	WorkspaceIcon string `json:"workspace_icon"`
-	WorkspaceId   string `json:"workspace_id"`
+	WorkspaceID   string `json:"workspace_id"`
 	WorkspaceName string `json:"workspace_name"`
 }

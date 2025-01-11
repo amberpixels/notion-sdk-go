@@ -10,15 +10,15 @@ type Template struct {
 	RichText RichTexts `json:"rich_text"`
 }
 
-// Deprecated
 // TemplateBlock is a Notion block for template blocks
+// Deprecated
 type TemplateBlock struct {
 	BasicBlock
 	Template Template `json:"template"`
 }
 
-// Deprecated
 // NewTemplateBlock creates a new TemplateBlock
+// Deprecated
 func NewTemplateBlock(t Template) *TemplateBlock {
 	return &TemplateBlock{
 		BasicBlock: NewBasicBlock(BlockTypeTemplate, t.ChildCount() > 0),

@@ -22,7 +22,7 @@ type Database struct {
 
 	// Note on both Title & Description:
 	// We do not have a separate limited RichText(type==text) type,
-	// So we consider users to carefuly use it.
+	// So we consider users to carefully use it.
 	// TODO: We can make it safer, at least via validation on Update/Create endpoints
 
 	IsInline bool `json:"is_inline"`

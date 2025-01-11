@@ -8,6 +8,7 @@ type Equation struct {
 	Expression string `json:"expression"`
 }
 
+// EquationBlock is a Notion block for equation blocks
 // TODO? REally?
 type EquationBlock struct {
 	BasicBlock

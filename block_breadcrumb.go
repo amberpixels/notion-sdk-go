@@ -19,9 +19,16 @@ func NewBreadcrumbBlock() *BreadcrumbBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *BreadcrumbBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*BreadcrumbBlock)(nil)
 	_ HierarchicalBlock = (*BreadcrumbBlock)(nil)
+	_ BasicBlockHolder  = (*BreadcrumbBlock)(nil)
 )
 
 func init() {

@@ -36,9 +36,16 @@ func (b *QuoteBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Quote.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *QuoteBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*QuoteBlock)(nil)
 	_ HierarchicalBlock = (*QuoteBlock)(nil)
+	_ BasicBlockHolder  = (*QuoteBlock)(nil)
 )
 
 func init() {

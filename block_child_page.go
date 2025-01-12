@@ -22,9 +22,16 @@ func NewChildPageBlock(title string) *ChildPageBlock {
 	return cdb
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ChildPageBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ChildPageBlock)(nil)
 	_ HierarchicalBlock = (*ChildPageBlock)(nil)
+	_ BasicBlockHolder  = (*ChildPageBlock)(nil)
 )
 
 func init() {

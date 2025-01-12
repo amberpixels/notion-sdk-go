@@ -10,9 +10,16 @@ func NewUnsupportedBlock() *UnsupportedBlock {
 	return &UnsupportedBlock{NewBasicBlock(BlockTypeUnsupported)}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *UnsupportedBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*UnsupportedBlock)(nil)
 	_ HierarchicalBlock = (*UnsupportedBlock)(nil)
+	_ BasicBlockHolder  = (*UnsupportedBlock)(nil)
 )
 
 func init() {

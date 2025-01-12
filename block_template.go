@@ -38,9 +38,16 @@ func (b *TemplateBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Template.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *TemplateBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*TemplateBlock)(nil)
 	_ HierarchicalBlock = (*TemplateBlock)(nil)
+	_ BasicBlockHolder  = (*TemplateBlock)(nil)
 )
 
 func init() {

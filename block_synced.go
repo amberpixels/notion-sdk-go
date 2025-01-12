@@ -41,9 +41,16 @@ func (b *SyncedBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Synced.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *SyncedBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*SyncedBlock)(nil)
 	_ HierarchicalBlock = (*SyncedBlock)(nil)
+	_ BasicBlockHolder  = (*SyncedBlock)(nil)
 )
 
 func init() {

@@ -35,9 +35,16 @@ func (b *ToggleBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Toggle.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ToggleBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ToggleBlock)(nil)
 	_ HierarchicalBlock = (*ToggleBlock)(nil)
+	_ BasicBlockHolder  = (*ToggleBlock)(nil)
 )
 
 func init() {

@@ -51,9 +51,16 @@ func NewLinkToDatabaseBlock(dbID DatabaseID) *LinkToPageBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *LinkToPageBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*LinkToPageBlock)(nil)
 	_ HierarchicalBlock = (*LinkToPageBlock)(nil)
+	_ BasicBlockHolder  = (*LinkToPageBlock)(nil)
 )
 
 func init() {

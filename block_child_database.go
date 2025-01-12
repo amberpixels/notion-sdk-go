@@ -22,9 +22,16 @@ func NewChildDataBasicBlock(title string) *ChildDataBasicBlock {
 	return cdb
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ChildDataBasicBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ChildDataBasicBlock)(nil)
 	_ HierarchicalBlock = (*ChildDataBasicBlock)(nil)
+	_ BasicBlockHolder  = (*ChildDataBasicBlock)(nil)
 )
 
 func init() {

@@ -4,20 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	notion "github.com/amberpixels/notion-sdk-go"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBlocksService(t *testing.T) {
 	ctx := context.Background()
 
 	timestamp, err := time.Parse(time.RFC3339, "2021-05-24T05:06:34.827Z")
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err, "Failed to parse timestamp")
 
 	user := notion.NewPersonUser("some_id", "some_user@example.com")
 
@@ -29,7 +27,6 @@ func TestBlocksService(t *testing.T) {
 			id         notion.BlockID
 			len        int
 			wantErr    bool
-			err        error
 		}{
 			{
 				name:       "returns blocks by id of parent block",
@@ -46,20 +43,13 @@ func TestBlocksService(t *testing.T) {
 				client := notion.New("some_token", notion.WithTransport(c))
 				got, err := client.Blocks.GetChildren(ctx, tt.id, nil)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("GetChildren() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-
-				if tt.len != len(got.Results) {
-					t.Errorf("GetChildren got %d, want: %d", len(got.Results), tt.len)
-				}
+				assert.Equal(t, tt.wantErr, err != nil, "Unexpected error state")
+				assert.Len(t, got.Results, tt.len, "Unexpected number of results")
 			})
 		}
 	})
 
 	t.Run("AppendChildren", func(t *testing.T) {
-
 		tests := []struct {
 			name       string
 			filePath   string
@@ -68,7 +58,6 @@ func TestBlocksService(t *testing.T) {
 			request    *notion.AppendBlockChildrenRequest
 			want       *notion.AppendBlockChildrenResponse
 			wantErr    bool
-			err        error
 		}{
 			{
 				name:       "return list object",
@@ -88,7 +77,6 @@ func TestBlocksService(t *testing.T) {
 				},
 				want: &notion.AppendBlockChildrenResponse{
 					Object: notion.ObjectTypeList,
-
 					Results: notion.Blocks{
 						decorateTestBasicBlock(notion.NewHeading2Block(
 							notion.Heading{
@@ -107,24 +95,9 @@ func TestBlocksService(t *testing.T) {
 				c := newMockedClient(t, tt.filePath, tt.statusCode)
 				client := notion.New("some_token", notion.WithTransport(c))
 				got, err := client.Blocks.AppendChildren(ctx, tt.id, tt.request)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("AppendChildren() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				a, err := json.Marshal(got)
-				if err != nil {
-					t.Errorf("AppendChildren() marshal error = %v", err)
-					return
-				}
-				b, err := json.Marshal(tt.want)
-				if err != nil {
-					t.Errorf("AppendChildren() marshal error = %v", err)
-					return
-				}
 
-				if !(string(a) == string(b)) {
-					t.Errorf("AppendChildren() got = %v, want %v", got, tt.want)
-				}
+				assert.Equal(t, tt.wantErr, err != nil, "Unexpected error state")
+				assert.JSONEq(t, string(toJSON(t, tt.want)), string(toJSON(t, got)), "Unexpected response")
 			})
 		}
 	})
@@ -137,7 +110,6 @@ func TestBlocksService(t *testing.T) {
 			id         notion.BlockID
 			want       notion.Block
 			wantErr    bool
-			err        error
 		}{
 			{
 				name:       "returns block object",
@@ -145,8 +117,6 @@ func TestBlocksService(t *testing.T) {
 				statusCode: http.StatusOK,
 				id:         "some_id",
 				want:       decorateTestBasicBlock(notion.NewChildPageBlock("Hello"), "some_id", &timestamp, user),
-				wantErr:    false,
-				err:        nil,
 			},
 		}
 
@@ -156,13 +126,8 @@ func TestBlocksService(t *testing.T) {
 				client := notion.New("some_token", notion.WithTransport(c))
 				got, err := client.Blocks.Get(ctx, tt.id)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Get() got = %v, want %v", got, tt.want)
-				}
+				assert.Equal(t, tt.wantErr, err != nil, "Unexpected error state")
+				assert.Equal(t, tt.want, got, "Unexpected block")
 			})
 		}
 	})
@@ -176,7 +141,6 @@ func TestBlocksService(t *testing.T) {
 			req        *notion.BlockUpdateRequest
 			want       notion.Block
 			wantErr    bool
-			err        error
 		}{
 			{
 				name:       "updates block and returns it",
@@ -198,8 +162,6 @@ func TestBlocksService(t *testing.T) {
 						},
 						Color: notion.ColorYellow,
 					}), "some_id", &timestamp, user),
-				wantErr: false,
-				err:     nil,
 			},
 		}
 
@@ -209,19 +171,14 @@ func TestBlocksService(t *testing.T) {
 				client := notion.New("some_token", notion.WithTransport(c))
 				got, err := client.Blocks.Update(ctx, tt.id, tt.req)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Get() got = %v, want %v", got, tt.want)
-				}
+				assert.Equal(t, tt.wantErr, err != nil, "Unexpected error state")
+				assert.Equal(t, tt.want, got, "Unexpected block update result")
 			})
 		}
 	})
 }
 
-func TestBlockUpdateRequest_MarshallJSON(t *testing.T) {
+func TestBlockUpdateRequest_MarshalJSON(t *testing.T) {
 	tests := []struct {
 		name    string
 		req     *notion.BlockUpdateRequest
@@ -240,13 +197,8 @@ func TestBlockUpdateRequest_MarshallJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := json.Marshal(tt.req)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MarshalJSON() got = %s, want %s", got, tt.want)
-			}
+			assert.Equal(t, tt.wantErr, err != nil, "Unexpected error state")
+			assert.JSONEq(t, string(tt.want), string(got), "Unexpected JSON")
 		})
 	}
 }

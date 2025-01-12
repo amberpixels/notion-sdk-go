@@ -19,9 +19,16 @@ func NewDividerBlock() *DividerBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *DividerBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*DividerBlock)(nil)
 	_ HierarchicalBlock = (*DividerBlock)(nil)
+	_ BasicBlockHolder  = (*DividerBlock)(nil)
 )
 
 func init() {

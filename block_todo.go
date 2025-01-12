@@ -36,9 +36,16 @@ func (b *ToDoBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.ToDo.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ToDoBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ToDoBlock)(nil)
 	_ HierarchicalBlock = (*ToDoBlock)(nil)
+	_ BasicBlockHolder  = (*ToDoBlock)(nil)
 )
 
 func init() {

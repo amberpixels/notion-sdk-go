@@ -112,15 +112,36 @@ func (b *Heading3Block) AppendChildren(children ...Block) {
 	b.HasChildren = b.Heading3.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *Heading1Block) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *Heading2Block) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *Heading3Block) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*Heading1Block)(nil)
 	_ HierarchicalBlock = (*Heading1Block)(nil)
+	_ BasicBlockHolder  = (*Heading1Block)(nil)
 
 	_ Block             = (*Heading2Block)(nil)
 	_ HierarchicalBlock = (*Heading2Block)(nil)
+	_ BasicBlockHolder  = (*Heading2Block)(nil)
 
 	_ Block             = (*Heading3Block)(nil)
 	_ HierarchicalBlock = (*Heading3Block)(nil)
+	_ BasicBlockHolder  = (*Heading3Block)(nil)
 )
 
 func init() {

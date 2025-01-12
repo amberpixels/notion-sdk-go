@@ -1,18 +1,11 @@
 package notion
 
 // Reference: https://developers.notion.com/reference/rich-text#equation
-//            https://developers.notion.com/reference/block#equation
 
 // Equation holds the equation expression
+// It's used both for inline equations and standalone equations.
 type Equation struct {
 	Expression string `json:"expression"`
-}
-
-// EquationBlock is a Notion block for equation blocks
-// TODO? REally?
-type EquationBlock struct {
-	BasicBlock
-	Equation Equation `json:"equation"`
 }
 
 // NewEquationRichText creates a new RichText with the given equation expression
@@ -23,8 +16,4 @@ func NewEquationRichText(expression string) *RichText {
 			Expression: expression,
 		},
 	}
-}
-
-func init() {
-	registerBlockDecoder(BlockTypeEquation, func() Block { return &EquationBlock{} })
 }

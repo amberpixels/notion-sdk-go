@@ -37,9 +37,16 @@ func (b *CalloutBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Callout.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *CalloutBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*CalloutBlock)(nil)
 	_ HierarchicalBlock = (*CalloutBlock)(nil)
+	_ BasicBlockHolder  = (*CalloutBlock)(nil)
 )
 
 func init() {

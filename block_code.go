@@ -23,9 +23,16 @@ func NewCodeBlock(code Code) *CodeBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *CodeBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*CodeBlock)(nil)
 	_ HierarchicalBlock = (*CodeBlock)(nil)
+	_ BasicBlockHolder  = (*CodeBlock)(nil)
 )
 
 func init() {

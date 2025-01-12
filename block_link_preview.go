@@ -23,9 +23,16 @@ func NewLinkPreviewBlock(lp LinkPreview) *LinkPreviewBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *LinkPreviewBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*LinkPreviewBlock)(nil)
 	_ HierarchicalBlock = (*LinkPreviewBlock)(nil)
+	_ BasicBlockHolder  = (*LinkPreviewBlock)(nil)
 )
 
 func init() {

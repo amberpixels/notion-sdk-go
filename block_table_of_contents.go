@@ -22,9 +22,16 @@ func NewTableOfContentsBlock(toc TableOfContents) *TableOfContentsBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *TableOfContentsBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*TableOfContentsBlock)(nil)
 	_ HierarchicalBlock = (*TableOfContentsBlock)(nil)
+	_ BasicBlockHolder  = (*TableOfContentsBlock)(nil)
 )
 
 func init() {

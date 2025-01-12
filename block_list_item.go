@@ -62,12 +62,26 @@ func (b *NumberedListItemBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.NumberedListItem.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *BulletedListItemBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *NumberedListItemBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*BulletedListItemBlock)(nil)
 	_ HierarchicalBlock = (*BulletedListItemBlock)(nil)
+	_ BasicBlockHolder  = (*BulletedListItemBlock)(nil)
 
 	_ Block             = (*NumberedListItemBlock)(nil)
 	_ HierarchicalBlock = (*NumberedListItemBlock)(nil)
+	_ BasicBlockHolder  = (*NumberedListItemBlock)(nil)
 )
 
 func init() {

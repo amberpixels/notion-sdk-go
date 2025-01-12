@@ -245,7 +245,7 @@ func BlocksToAST(blocks notion.Blocks, parentArg ...*NodeBlock) *NodeBlock {
 
 		// Recursively process children if the block has them
 		if block.GetHasChildren() {
-			if deeper := BlocksToAST(notion.GetChildren(block), node); deeper.GetChildCount() > 0 {
+			if deeper := BlocksToAST(block.(notion.HierarchicalBlock).GetChildren(), node); deeper.GetChildCount() > 0 {
 				node.firstChild = deeper.GetFirstChild().(*NodeBlock)
 				node.lastChild = deeper.GetLastChild().(*NodeBlock)
 			}
@@ -291,7 +291,7 @@ func ASTToBlocks(n *NodeBlock) notion.Blocks {
 		// Add children blocks recursively
 		if child := node.GetFirstChild(); child != nil {
 			children := ASTToBlocks(child.(*NodeBlock))
-			notion.SetChildren(block, children) // Assuming notion.Block supports SetChildren()
+			block.(notion.HierarchicalBlock).SetChildren(children)
 		}
 
 		// Process the next sibling

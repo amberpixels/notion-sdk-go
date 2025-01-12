@@ -18,7 +18,9 @@ func TestFromBlocks(t *testing.T) {
 	childBlock2.ID = notion.BlockID("child2-id")
 
 	paragraphBlock := notion.NewParagraphBlock(notion.Paragraph{
-		Children: notion.Blocks{childBlock1, childBlock2},
+		AtomChildren: notion.AtomChildren{
+			Children: notion.Blocks{childBlock1, childBlock2},
+		},
 	})
 	paragraphBlock.ID = notion.BlockID("paragraph-id")
 

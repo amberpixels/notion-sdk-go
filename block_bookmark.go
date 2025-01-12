@@ -27,6 +27,12 @@ var (
 	_ HierarchicalBlock = (*BookmarkBlock)(nil)
 )
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *BookmarkBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 func init() {
 	registerBlockDecoder(BlockTypeBookmark, func() Block { return &BookmarkBlock{} })
 }

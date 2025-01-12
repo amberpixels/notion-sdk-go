@@ -33,9 +33,16 @@ func (b *ColumnBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Column.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ColumnBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ColumnBlock)(nil)
 	_ HierarchicalBlock = (*ColumnBlock)(nil)
+	_ BasicBlockHolder  = (*ColumnBlock)(nil)
 )
 
 func init() {

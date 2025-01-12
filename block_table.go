@@ -56,12 +56,26 @@ func (b *TableBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Table.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *TableBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *TableRowBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*TableBlock)(nil)
 	_ HierarchicalBlock = (*TableBlock)(nil)
+	_ BasicBlockHolder  = (*TableBlock)(nil)
 
 	_ Block             = (*TableRowBlock)(nil)
 	_ HierarchicalBlock = (*TableRowBlock)(nil)
+	_ BasicBlockHolder  = (*TableRowBlock)(nil)
 )
 
 func init() {

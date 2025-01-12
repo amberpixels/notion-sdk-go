@@ -35,9 +35,16 @@ func (b *ParagraphBlock) AppendChildren(children ...Block) {
 	b.HasChildren = b.Paragraph.ChildCount() > 0
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ParagraphBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*ParagraphBlock)(nil)
 	_ HierarchicalBlock = (*ParagraphBlock)(nil)
+	_ BasicBlockHolder  = (*ParagraphBlock)(nil)
 )
 
 func init() {

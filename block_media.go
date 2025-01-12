@@ -129,21 +129,56 @@ var (
 	_ Media = (*VideoBlock)(nil)
 )
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *PdfBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *FileBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *ImageBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *AudioBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *VideoBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*PdfBlock)(nil)
 	_ HierarchicalBlock = (*PdfBlock)(nil)
+	_ BasicBlockHolder  = (*PdfBlock)(nil)
 
 	_ Block             = (*FileBlock)(nil)
 	_ HierarchicalBlock = (*FileBlock)(nil)
+	_ BasicBlockHolder  = (*FileBlock)(nil)
 
 	_ Block             = (*ImageBlock)(nil)
 	_ HierarchicalBlock = (*ImageBlock)(nil)
+	_ BasicBlockHolder  = (*ImageBlock)(nil)
 
 	_ Block             = (*AudioBlock)(nil)
 	_ HierarchicalBlock = (*AudioBlock)(nil)
+	_ BasicBlockHolder  = (*AudioBlock)(nil)
 
 	_ Block             = (*VideoBlock)(nil)
 	_ HierarchicalBlock = (*VideoBlock)(nil)
+	_ BasicBlockHolder  = (*VideoBlock)(nil)
 )
 
 func init() {

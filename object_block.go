@@ -159,6 +159,11 @@ func NewBasicBlock(blockType BlockType, hasChildrenArg ...bool) BasicBlock {
 	}
 }
 
+// GetBasicBlock returns the BasicBlock (itself).
+func (b BasicBlock) GetBasicBlock() BasicBlock { return b }
+
+// SetBasicBlock must be set on the implemented blocks.
+
 // GetType returns the Type of the BasicBlock.
 func (b BasicBlock) GetType() BlockType { return b.Type }
 

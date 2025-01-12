@@ -22,9 +22,16 @@ func NewEmbedBlock(embed Embed) *EmbedBlock {
 	}
 }
 
+// SetBasicBlock implements the SetBasicBlock method of the BasicBlockHolder interface.
+func (b *EmbedBlock) SetBasicBlock(block BasicBlock) Block {
+	b.BasicBlock = block
+	return b
+}
+
 var (
 	_ Block             = (*EmbedBlock)(nil)
 	_ HierarchicalBlock = (*EmbedBlock)(nil)
+	_ BasicBlockHolder  = (*EmbedBlock)(nil)
 )
 
 func init() {
